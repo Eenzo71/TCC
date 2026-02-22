@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerador QR Code - TCC</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body { 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: sans-serif;
+            margin-top: 50px; 
+        }
+        #qrcode { 
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+        }
+    </style>
+</head>
+<body style="background-color: #f0f0f0;">
+    <h2>Simulador - Tela do Aluno</h2>
+    <p>Este é o QR Code que aparecerá no celular do aluno offline.</p>
+    
+    <div id="qrcode"></div>
+
+    <script>
+        // Dados simulados do aluno (como se ele tivesse clicado em "Centro")
+        const dadosAluno = {
+            id: "98765-ABC",
+            destino: "Centro"
+        };
+
+        // Transforma os dados em texto e gera a imagem do QR Code
+        new QRCode(document.getElementById("qrcode"), {
+            text: JSON.stringify(dadosAluno),
+            width: 250,
+            height: 250
+        });
+    </script>
+</body>
+</html>
