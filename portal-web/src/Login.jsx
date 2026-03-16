@@ -25,7 +25,7 @@ export default function Login({ irParaCadastro, irParaPainel }) {
   return (
     <div className="container">
       <div className="top-bar">
-        <h1>BusFlow</h1>
+        <h1>BusGap</h1>
       </div>
       
       <div className="main-content">
