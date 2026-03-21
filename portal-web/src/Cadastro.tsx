@@ -125,15 +125,15 @@ export default function Cadastro({ irParaSucesso, irParaLogin }: CadastroProps) 
         try {
           const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(busca)}`);
           const data = await response.json();
-          
+
           if (data && data.length > 0) {
             setFormData(prev => ({ ...prev, lat: data[0].lat, lng: data[0].lon }));
             coordenadasEncontradas = true;
-            
+
             if (busca !== tentativasBusca[0]) {
               alert(`Não encontramos o endereço exato, mas centralizamos em: ${busca}. Por favor, arraste o pino para a sua casa.`);
             }
-            
+
             break;
           }
         } catch (error) {
@@ -143,7 +143,7 @@ export default function Cadastro({ irParaSucesso, irParaLogin }: CadastroProps) 
 
       if (!coordenadasEncontradas) {
         alert("Erro de conexão com o satélite. Verifique sua internet ou tente novamente.");
-        return; 
+        return;
       }
     }
     setStep(step + 1);
@@ -166,30 +166,50 @@ export default function Cadastro({ irParaSucesso, irParaLogin }: CadastroProps) 
       const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
       const user = userCredential.user;
 
-      const CHAVE_SECRETA = "seguranca-busgap-2026";
-      const cpfCriptografado = CryptoJS.AES.encrypt(formData.cpf, CHAVE_SECRETA).toString();
+      const CHAVE_SECRETA = import.meta.env.VITE_alululu;
 
+      // dados pessoais
+      const cpfCriptografado = CryptoJS.AES.encrypt(formData.cpf, CHAVE_SECRETA).toString();
+      const celularCriptografado = CryptoJS.AES.encrypt(formData.celular, CHAVE_SECRETA).toString();
+      const telEmergenciaCriptografado = formData.telefoneEmergencia
+        ? CryptoJS.AES.encrypt(formData.telefoneEmergencia, CHAVE_SECRETA).toString()
+        : "";
+
+      // endrc
+      const cepCriptografado = CryptoJS.AES.encrypt(formData.cep, CHAVE_SECRETA).toString();
+      const estadoCriptografado = CryptoJS.AES.encrypt(formData.estado, CHAVE_SECRETA).toString();
+      const cidadeCriptografada = CryptoJS.AES.encrypt(formData.cidade, CHAVE_SECRETA).toString();
+      const bairroCriptografado = CryptoJS.AES.encrypt(formData.bairro, CHAVE_SECRETA).toString();
+      const ruaCriptografada = CryptoJS.AES.encrypt(formData.rua, CHAVE_SECRETA).toString();
+      const numeroCriptografado = CryptoJS.AES.encrypt(formData.numero, CHAVE_SECRETA).toString();
+      const complementoCriptografado = formData.complemento
+        ? CryptoJS.AES.encrypt(formData.complemento, CHAVE_SECRETA).toString()
+        : "";
+
+      // Coords
       const latCriptografada = CryptoJS.AES.encrypt(formData.lat, CHAVE_SECRETA).toString();
       const lngCriptografada = CryptoJS.AES.encrypt(formData.lng, CHAVE_SECRETA).toString();
 
+      // salvando a criptografia 
       await setDoc(doc(db, "usuarios", user.uid), {
         nome: formData.nome,
         cpf: cpfCriptografado,
-        celular: formData.celular,
-        telefoneEmergencia: formData.telefoneEmergencia,
+        celular: celularCriptografado,
+        telefoneEmergencia: telEmergenciaCriptografado,
         endereco: {
-          cep: formData.cep,
-          estado: formData.estado,
-          cidade: formData.cidade,
-          bairro: formData.bairro,
-          rua: formData.rua,
-          numero: formData.numero,
-          complemento: formData.complemento,
-          lat: latCriptografada, 
+          cep: cepCriptografado,
+          estado: estadoCriptografado,
+          cidade: cidadeCriptografada,
+          bairro: bairroCriptografado,
+          rua: ruaCriptografada,
+          numero: numeroCriptografado,
+          complemento: complementoCriptografado,
+          lat: latCriptografada,
           lng: lngCriptografada
         },
         tipo_perfil: "responsavel"
       });
+
       irParaSucesso();
     } catch (error: any) {
       console.error("Erro ao cadastrar:", error);
@@ -311,30 +331,30 @@ export default function Cadastro({ irParaSucesso, irParaLogin }: CadastroProps) 
             </>
           )}
           {/* ETAPA 4: mapinha*/}
-        {step === 4 && (
-          <>
-            <h3>
-              Ajuste Manual
-            </h3>
-            <p>
-              Segure e arraste o pino azul para o local exato da sua residência.
-            </p>
-            
-            <div style={{ height: '300px', width: '100%', marginBottom: '20px', borderRadius: '10px', overflow: 'hidden' }}>
-              {formData.lat && (
-                <MapContainer center={[parseFloat(formData.lat), parseFloat(formData.lng)]} zoom={16} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
-                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                  <MarcadorArrastavel lat={formData.lat} lng={formData.lng} setFormData={setFormData} />
-                </MapContainer>
-              )}
-            </div>
+          {step === 4 && (
+            <>
+              <h3>
+                Ajuste Manual
+              </h3>
+              <p>
+                Segure e arraste o pino azul para o local exato da sua residência.
+              </p>
 
-            <div style={styles.botoes}>
-              <button type="button" onClick={prevStep} style={styles.btnVoltar}>Voltar</button>
-              <button type="submit" style={styles.btnAvancar}>Finalizar Cadastro</button>
-            </div>
-          </>
-        )}
+              <div style={{ height: '300px', width: '100%', marginBottom: '20px', borderRadius: '10px', overflow: 'hidden' }}>
+                {formData.lat && (
+                  <MapContainer center={[parseFloat(formData.lat), parseFloat(formData.lng)]} zoom={16} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
+                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                    <MarcadorArrastavel lat={formData.lat} lng={formData.lng} setFormData={setFormData} />
+                  </MapContainer>
+                )}
+              </div>
+
+              <div style={styles.botoes}>
+                <button type="button" onClick={prevStep} style={styles.btnVoltar}>Voltar</button>
+                <button type="submit" style={styles.btnAvancar}>Finalizar Cadastro</button>
+              </div>
+            </>
+          )}
         </form>
       </div>
       {/* popup email cadastrado*/}

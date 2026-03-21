@@ -9,15 +9,17 @@ type Tela = 'login' | 'cadastro' | 'sucesso' | 'painel';
 export default function App() {
   const [telaAtual, setTelaAtual] = useState<Tela>('login');
 
+  // cronometro pra cutcine
   useEffect(() => {
     if (telaAtual === 'sucesso') {
       const timer = setTimeout(() => {
-        setTelaAtual('login');
-      }, 2000);
+        setTelaAtual('painel'); 
+      }, 3000); 
       return () => clearTimeout(timer);
     }
   }, [telaAtual]);
 
+  // Telas
   if (telaAtual === 'login') {
     return <Login irParaCadastro={() => setTelaAtual('cadastro')} irParaPainel={() => setTelaAtual('painel')} />;
   }
@@ -28,8 +30,9 @@ export default function App() {
 
   if (telaAtual === 'sucesso') {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#e8f5e9' }}>
-        <h1 style={{ color: '#2e7d32', fontSize: '3rem' }}>Sucesso</h1>
+      // div da cutcine
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#111' }}>
+        <h1 style={{ color: '#fff', fontSize: '2rem' }}>🎉 Conta criada com sucesso! Preparando o BusGap...</h1>
       </div>
     );
   }
