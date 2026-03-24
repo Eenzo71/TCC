@@ -3,11 +3,26 @@ import Login from './Login';
 import Cadastro from './Cadastro';
 import Painel from './Painel';
 import './style.css';
+import Radar from './Radar';
+import PanfletoDigital from './PanfletoDigital';
 
-type Tela = 'login' | 'cadastro' | 'sucesso' | 'painel';
+type Tela = 'login' | 'cadastro' | 'sucesso' | 'painel' | 'radar' | 'panfleto';
 
 export default function App() {
   const [telaAtual, setTelaAtual] = useState<Tela>('login');
+  
+  const [slugConvite, setSlugConvite] = useState<string | null>(null);
+  const [empresaVinculada, setEmpresaVinculada] = useState<string | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const conviteNaUrl = params.get('convite');
+
+    if (conviteNaUrl) {
+      setSlugConvite(conviteNaUrl);
+      setTelaAtual('panfleto');
+    }
+  }, []);
 
   // cronometro pra cutcine
   useEffect(() => {
@@ -25,7 +40,13 @@ export default function App() {
   }
 
   if (telaAtual === 'cadastro') {
-    return <Cadastro irParaSucesso={() => setTelaAtual('sucesso')} irParaLogin={() => setTelaAtual('login')} />;
+    return (
+      <Cadastro 
+        irParaLogin={() => setTelaAtual('login')} 
+        irParaSucesso={() => setTelaAtual('sucesso')} 
+        empresaId={empresaVinculada}
+      />
+    );
   }
 
   if (telaAtual === 'sucesso') {
@@ -38,7 +59,23 @@ export default function App() {
   }
 
   if (telaAtual === 'painel') {
-    return <Painel irParaLogin={() => setTelaAtual('login')} />;
+    return <Painel irParaLogin={() => setTelaAtual('login')} irParaRadar={() => setTelaAtual('radar')} />;
+  }
+
+  if (telaAtual === 'panfleto' && slugConvite) {
+    return (
+      <PanfletoDigital 
+        slugConvite={slugConvite}
+        irParaCadastroResponsavel={(empresaId) => {
+          setEmpresaVinculada(empresaId);
+          setTelaAtual('cadastro'); 
+        }}
+        irParaCadastroAlunoMaior={(empresaId) => {
+          setEmpresaVinculada(empresaId); 
+          setTelaAtual('cadastro'); 
+        }}
+      />
+    );
   }
 
   return null;

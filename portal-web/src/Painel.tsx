@@ -4,31 +4,27 @@ import { signOut } from 'firebase/auth';
 
 interface PainelProps {
   irParaLogin: () => void;
+  irParaRadar: () => void; // A nova rota entrando aqui!
 }
 
-export default function Painel({ irParaLogin }: PainelProps) {
-  const handleLogout = () => {
-    signOut(auth).then(() => {
-      irParaLogin();
-    }).catch((error) => {
-      console.error("Erro ao sair:", error);
-    });
-  };
-
+export default function Painel({ irParaLogin, irParaRadar }: PainelProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100vh', backgroundColor: '#fff3e0' }}>
-      <h1 style={{ color: '#e65100', fontSize: '3rem', marginTop: '100px' }}>
-        ia la logo kkkkkkkk
-      </h1>
-      <p style={{ fontSize: '1.2rem', color: '#555', marginTop: '20px' }}>
-        No futuro, aqui vai ficar o painel administrativo do BusGap!
-      </p>
-      <button 
-        onClick={handleLogout}
-        style={{ marginTop: '50px', padding: '12px 30px', fontSize: '1rem', backgroundColor: '#d32f2f', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}
-      >
-        Sair do Sistema
-      </button>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', backgroundColor: '#f4f4f9' }}>
+      
+      <h1 style={{ color: '#111', marginBottom: '10px' }}>Painel Administrativo</h1>
+      <p style={{ color: '#555', marginBottom: '30px' }}>Bem-vindo ao centro de comando do BusGap.</p>
+
+      <div style={{ display: 'flex', gap: '20px' }}>
+
+        {/* BOTÃO DE SAIR */}
+        <button 
+          onClick={irParaLogin} 
+          style={{ padding: '15px 30px', backgroundColor: '#fff', color: '#d32f2f', border: '2px solid #d32f2f', borderRadius: '10px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}
+        >
+          Sair da Conta
+        </button>
+      </div>
+
     </div>
   );
 }

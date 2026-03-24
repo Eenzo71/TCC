@@ -24,9 +24,10 @@ L.Icon.Default.mergeOptions({
 interface CadastroProps {
   irParaSucesso: () => void;
   irParaLogin: () => void;
+  empresaId?: string | null;
 }
 
-export default function Cadastro({ irParaSucesso, irParaLogin }: CadastroProps) {
+export default function Cadastro({ irParaLogin, irParaSucesso, empresaId }: CadastroProps) {
   const [step, setStep] = useState(1);
   const [showPopupEmail, setShowPopupEmail] = useState(false);
   const [formData, setFormData] = useState({
@@ -207,7 +208,8 @@ export default function Cadastro({ irParaSucesso, irParaLogin }: CadastroProps) 
           lat: latCriptografada,
           lng: lngCriptografada
         },
-        tipo_perfil: "responsavel"
+        tipo_perfil: "responsavel",
+        empresa_vinculada: empresaId || null
       });
 
       irParaSucesso();
