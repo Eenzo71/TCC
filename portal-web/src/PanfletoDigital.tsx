@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { db } from './firebaseConfig';
-import { collection, query, where, getDocs } from 'firebase/firestore';
 
 interface PanfletoProps {
   slugConvite: string;
@@ -16,18 +14,17 @@ export default function PanfletoDigital({ slugConvite, irParaCadastroResponsavel
   useEffect(() => {
     const buscarEmpresa = async () => {
       try {
-        const q = query(collection(db, "empresas"), where("slug_convite", "==", slugConvite));
-        const querySnapshot = await getDocs(q);
+        const resposta = await fetch(`http://localhost:3000/api/empresa/convite/${slugConvite}`);
+        const dados = await resposta.json();
 
-        if (!querySnapshot.empty) {
-          const docEmpresa = querySnapshot.docs[0];
-          setEmpresa({ id: docEmpresa.id, ...docEmpresa.data() });
+        if (resposta.ok && dados.valido) {
+          setEmpresa(dados.empresa);
         } else {
-          setErro('Link de convite inválido ou empresa não encontrada.');
+          setErro(dados.erro || 'Convite não encontrado.');
         }
       } catch (error) {
-        console.error("Erro ao buscar convite:", error);
-        setErro('Erro ao carregar o convite.');
+        console.error("Erro ao buscar convite no servidor:", error);
+        setErro('Erro de conexão com o servidor do BusGap.');
       } finally {
         setCarregando(false);
       }
@@ -45,17 +42,15 @@ export default function PanfletoDigital({ slugConvite, irParaCadastroResponsavel
         <div style={styles.cabecalho}>
           <h3 style={{ color: '#4caf50', margin: 0 }}>Convite Oficial</h3>
           <h1 style={{ color: '#111', marginTop: '10px' }}>{empresa?.nomeFantasia}</h1>
-          <p style={{ color: '#555' }}>Escolha o seu perfil abaixo para se vincular à nossa frota no BusGap.</p>
+          <p style={{ color: '#555' }}>Escolha o seu perfil abaixo para se vincular à frota.</p>
         </div>
 
         <div style={styles.botoesContainer}>
-          {/* Pais/Responsáveis */}
           <button onClick={() => irParaCadastroResponsavel(empresa.id)} style={styles.btnPrimario}>
             👨‍👩‍👧 Cadastro de Pais / Responsáveis
             <span style={styles.subTextoBtn}>Para cadastrar seus filhos no transporte</span>
           </button>
 
-          {/* Alunos Maiores */}
           <button onClick={() => irParaCadastroAlunoMaior(empresa.id)} style={styles.btnSecundario}>
             🎓 Cadastro de Aluno (+18)
             <span style={styles.subTextoBtn}>Para universitários ou maiores de idade</span>
@@ -63,10 +58,9 @@ export default function PanfletoDigital({ slugConvite, irParaCadastroResponsavel
 
           <hr style={{ width: '100%', border: '1px solid #eee', margin: '20px 0' }} />
 
-          {/* Baixar o App */}
-          <button onClick={() => alert("Redirecionando para a Play Store...")} style={styles.btnApp}>
+          <button onClick={() => alert("Em breve na Play Store!")} style={styles.btnApp}>
             📱 Baixar o Aplicativo
-            <span style={styles.subTextoBtn}>Vou gozar alguem coloca um texto que faz sentido ai</span>
+            <span style={styles.subTextoBtn}>Baixe o app oficial do BusGap para acompanhar a rota</span>
           </button>
         </div>
       </div>

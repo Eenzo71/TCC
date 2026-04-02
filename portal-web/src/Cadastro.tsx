@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
-import { auth, db } from './firebaseConfig';
-import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import CryptoJS from 'crypto-js';
-import { validarCPF } from './validarCpf';
+import { auth } from './firebaseConfig';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 //mapinha
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -68,56 +65,98 @@ export default function Cadastro({ irParaLogin, irParaSucesso, empresaId }: Cada
   };
 
   const nextStep = async () => {
-    // Verificação etapa 1 de cadastro
+    // Verificação etapa 1
     if (step === 1) {
-
-      // Verificação de e-mail já cadastrado
       try {
-        const metodos = await fetchSignInMethodsForEmail(auth, formData.email);
-        if (metodos.length > 0) {
-          setShowPopupEmail(true);
+        const respostaBack = await fetch('http://localhost:3000/api/cadastro/validar-etapa1', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+            confirmPassword: formData.confirmPassword
+          })
+        });
+
+        const dadosBack = await respostaBack.json();
+
+        if (!respostaBack.ok || !dadosBack.valido) {
+          if (dadosBack.emailEmUso) {
+            setShowPopupEmail(true);
+            return;
+          }
+          alert(`⚠️ ${dadosBack.erro}`);
           return;
         }
       } catch (error) {
-        console.error("Erro ao verificar e-mail:", error);
-      }
-
-      // Verificação de senhas iguais
-      if (formData.password !== formData.confirmPassword) {
-        alert("As senhas precisam ser iguais para avançar.");
+        console.error("Erro ao conectar com o backend:", error);
+        alert("Erro de conexão com o servidor de segurança. Verifique se o Back-end está rodando.");
         return;
       }
     }
 
     // Verificação etapa 2 de cadastro
     if (step === 2) {
-      // CPF
-      if (!validarCPF(formData.cpf)) {
-        alert("Ops! Esse CPF é inválido. Verifique os números digitados.");
-        return;
-      }
+      try {
+        const respostaBack = await fetch('http://localhost:3000/api/cadastro/validar-etapa2', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            nome: formData.nome,
+            cpf: formData.cpf,
+            celular: formData.celular,
+            telefoneEmergencia: formData.telefoneEmergencia
+          })
+        });
 
-      // cell
-      const celularLimpo = formData.celular.replace(/\D/g, '');
+        const dadosBack = await respostaBack.json();
 
-      if (celularLimpo.length !== 11) {
-        alert("Ops! O número de celular parece incorreto. Digite com DDD (Ex: 38 99999-9999).");
+        if (!respostaBack.ok || !dadosBack.valido) {
+          alert(`⚠️ ${dadosBack.erro}`);
+          return;
+        }
+      } catch (error) {
+        console.error("Erro ao conectar com o backend na etapa 2:", error);
+        alert("Erro de conexão com o servidor de segurança. Verifique se o Back-end está rodando.");
         return;
       }
     }
 
     // Validação da Etapa 3 (Endereço)
     if (step === 3) {
-      if (!formData.cep || !formData.rua || !formData.numero || !formData.estado || !formData.cidade) {
-        alert("Ops! Preencha os campos obrigatórios do endereço para avançar.");
+
+      // --- COMUNICAÇÃO COM O BACK-END ---
+      try {
+        const respostaBack = await fetch('http://localhost:3000/api/cadastro/validar-etapa3', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            cep: formData.cep,
+            rua: formData.rua,
+            numero: formData.numero,
+            bairro: formData.bairro,
+            cidade: formData.cidade,
+            estado: formData.estado
+          })
+        });
+
+        const dadosBack = await respostaBack.json();
+
+        if (!respostaBack.ok || !dadosBack.valido) {
+          alert(`⚠️ ${dadosBack.erro}`);
+          return;
+        }
+      } catch (error) {
+        console.error("Erro ao conectar com o backend na etapa 3:", error);
+        alert("Erro de conexão com o servidor. Verifique se o Back-end está rodando.");
         return;
       }
 
       const tentativasBusca = [
-        `${formData.rua}, ${formData.numero}, ${formData.cidade}, ${formData.estado}, Brasil`, // CEP Exato
-        `${formData.cidade}, ${formData.estado}, Brasil`,                                      // Cidade
-        `${formData.estado}, Brasil`,                                                          // Estado
-        `Brasil`                                                                               // País
+        `${formData.rua}, ${formData.numero}, ${formData.cidade}, ${formData.estado}, Brasil`,
+        `${formData.cidade}, ${formData.estado}, Brasil`,
+        `${formData.estado}, Brasil`,
+        `Brasil`
       ];
 
       let coordenadasEncontradas = false;
@@ -156,66 +195,51 @@ export default function Cadastro({ irParaLogin, irParaSucesso, empresaId }: Cada
     irParaLogin();
   };
 
+  const [carregandoFinal, setCarregandoFinal] = useState(false); // Estado para o visual do botão
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert("As senhas não coincidem!");
-      return;
-    }
+    setCarregandoFinal(true); // Muda o texto do botão
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-      const user = userCredential.user;
-
-      const CHAVE_SECRETA = import.meta.env.VITE_alululu;
-
-      // dados pessoais
-      const cpfCriptografado = CryptoJS.AES.encrypt(formData.cpf, CHAVE_SECRETA).toString();
-      const celularCriptografado = CryptoJS.AES.encrypt(formData.celular, CHAVE_SECRETA).toString();
-      const telEmergenciaCriptografado = formData.telefoneEmergencia
-        ? CryptoJS.AES.encrypt(formData.telefoneEmergencia, CHAVE_SECRETA).toString()
-        : "";
-
-      // endrc
-      const cepCriptografado = CryptoJS.AES.encrypt(formData.cep, CHAVE_SECRETA).toString();
-      const estadoCriptografado = CryptoJS.AES.encrypt(formData.estado, CHAVE_SECRETA).toString();
-      const cidadeCriptografada = CryptoJS.AES.encrypt(formData.cidade, CHAVE_SECRETA).toString();
-      const bairroCriptografado = CryptoJS.AES.encrypt(formData.bairro, CHAVE_SECRETA).toString();
-      const ruaCriptografada = CryptoJS.AES.encrypt(formData.rua, CHAVE_SECRETA).toString();
-      const numeroCriptografado = CryptoJS.AES.encrypt(formData.numero, CHAVE_SECRETA).toString();
-      const complementoCriptografado = formData.complemento
-        ? CryptoJS.AES.encrypt(formData.complemento, CHAVE_SECRETA).toString()
-        : "";
-
-      // Coords
-      const latCriptografada = CryptoJS.AES.encrypt(formData.lat, CHAVE_SECRETA).toString();
-      const lngCriptografada = CryptoJS.AES.encrypt(formData.lng, CHAVE_SECRETA).toString();
-
-      // salvando a criptografia 
-      await setDoc(doc(db, "usuarios", user.uid), {
-        nome: formData.nome,
-        cpf: cpfCriptografado,
-        celular: celularCriptografado,
-        telefoneEmergencia: telEmergenciaCriptografado,
-        endereco: {
-          cep: cepCriptografado,
-          estado: estadoCriptografado,
-          cidade: cidadeCriptografada,
-          bairro: bairroCriptografado,
-          rua: ruaCriptografada,
-          numero: numeroCriptografado,
-          complemento: complementoCriptografado,
-          lat: latCriptografada,
-          lng: lngCriptografada
-        },
-        tipo_perfil: "responsavel",
-        empresa_vinculada: empresaId || null
+      // MANDA O PACOTÃO CRU PRO BACK-END (Ele revalida, criptografa e salva!)
+      const respostaCriacao = await fetch('http://localhost:3000/api/cadastro/finalizar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          formData: formData, // Mandamos o objeto inteiro que coletamos nas etapas!
+          empresaId: empresaId
+        })
       });
 
-      irParaSucesso();
+      const dadosCriacao = await respostaCriacao.json();
+
+      if (!respostaCriacao.ok || !dadosCriacao.valido) {
+        // Se o Back-end achar falha na revalidação, ele corta a onda na hora!
+        alert(`⚠️ Erro de Segurança: ${dadosCriacao.erro}`);
+        setCarregandoFinal(false);
+        return;
+      }
+
+      // auto-login
+      try {
+        await signInWithEmailAndPassword(auth, formData.email, formData.password);
+
+        // cutcine
+        irParaSucesso();
+
+      } catch (loginError) {
+        console.error("Erro ao fazer o auto-login:", loginError);
+        alert("Conta criada com sucesso! Mas por favor, faça o login manualmente.");
+        irParaLogin();
+      }
+
     } catch (error: any) {
-      console.error("Erro ao cadastrar:", error);
-      alert("Erro ao finalizar cadastro: " + error.message);
+      console.error("Erro fatal ao tentar finalizar o cadastro:", error);
+      alert("Erro crítico de conexão. O servidor pode estar offline.");
+      setCarregandoFinal(false);
     }
   };
 
@@ -258,7 +282,7 @@ export default function Cadastro({ irParaLogin, irParaSucesso, empresaId }: Cada
               </div>
               <div style={styles.botoes}>
                 <button type="button" onClick={irParaLogin} style={styles.btnVoltar}>Cancelar</button>
-                <button type="submit" style={styles.btnAvancar}>Próximo</button>
+                <button type="button" onClick={nextStep} style={styles.btnAvancar}>Próximo</button>
               </div>
             </>
           )}
@@ -284,7 +308,7 @@ export default function Cadastro({ irParaLogin, irParaSucesso, empresaId }: Cada
               </div>
               <div style={styles.botoes}>
                 <button type="button" onClick={prevStep} style={styles.btnVoltar}>Voltar</button>
-                <button type="submit" style={styles.btnAvancar}>Próximo</button>
+                <button type="button" onClick={nextStep} style={styles.btnAvancar}>Próximo</button>
               </div>
             </>
           )}
@@ -328,7 +352,7 @@ export default function Cadastro({ irParaLogin, irParaSucesso, empresaId }: Cada
               </div>
               <div style={styles.botoes}>
                 <button type="button" onClick={prevStep} style={styles.btnVoltar}>Voltar</button>
-                <button type="submit" style={styles.btnAvancar}>Próximo</button>
+                <button type="button" onClick={nextStep} style={styles.btnAvancar}>Próximo</button>
               </div>
             </>
           )}
@@ -353,7 +377,9 @@ export default function Cadastro({ irParaLogin, irParaSucesso, empresaId }: Cada
 
               <div style={styles.botoes}>
                 <button type="button" onClick={prevStep} style={styles.btnVoltar}>Voltar</button>
-                <button type="submit" style={styles.btnAvancar}>Finalizar Cadastro</button>
+                <button type="submit" disabled={carregandoFinal} style={styles.btnAvancar}>
+                  {carregandoFinal ? 'Processando Segurança...' : 'Finalizar Cadastro'}
+                </button>
               </div>
             </>
           )}

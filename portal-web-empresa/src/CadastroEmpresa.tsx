@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
-import { auth, db } from './firebaseConfig';
-import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import CryptoJS from 'crypto-js';
-import { validarCNPJ } from './validarCnpj';
-import { validarCPF } from './validarCpf'; // <-- Importando a validação do CPF que você vai copiar!
-
+import { auth } from './firebaseConfig';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -29,17 +24,14 @@ interface CadastroEmpresaProps {
 export default function CadastroEmpresa({ irParaLogin, irParaPainel }: CadastroEmpresaProps) {
   const [step, setStep] = useState(1);
   const [showPopupEmail, setShowPopupEmail] = useState(false);
+  const [carregandoFinal, setCarregandoFinal] = useState(false);
+  
   const [formData, setFormData] = useState({
-    // Acesso
     email: '', password: '', confirmPassword: '',
-    // Dados Jurídicos
     razaoSocial: '', nomeFantasia: '', cnpj: '', 
-    // Responsável Legal
     nomeResponsavel: '', cpfResponsavel: '', telefoneEmpresa: '',
-    // Endereço e Satélite
     cep: '', estado: '', cidade: '', bairro: '', rua: '', numero: '', complemento: '',
     lat: '', lng: '',
-    // Compliance
     termosAceitos: false 
   });
 
@@ -48,7 +40,7 @@ export default function CadastroEmpresa({ irParaLogin, irParaPainel }: CadastroE
     const valorFinal = type === 'checkbox' ? checked : value;
     
     setFormData(prev => ({ ...prev, [name]: valorFinal }));
-
+    // cep
     if (name === 'cep') {
       const cepLimpo = value.replace(/\D/g, '');
       if (cepLimpo.length === 8) {
@@ -72,55 +64,103 @@ export default function CadastroEmpresa({ irParaLogin, irParaPainel }: CadastroE
   };
 
   const nextStep = async () => {
-    // Etapa 1: Credenciais
+    // login
     if (step === 1) {
       try {
-        const metodos = await fetchSignInMethodsForEmail(auth, formData.email);
-        if (metodos.length > 0) {
-          setShowPopupEmail(true);
+        const respostaBack = await fetch('http://localhost:3000/api/empresa/validar-etapa1', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+            confirmPassword: formData.confirmPassword
+          })
+        });
+
+        const dadosBack = await respostaBack.json();
+
+        if (!respostaBack.ok || !dadosBack.valido) {
+          if (dadosBack.emailEmUso) {
+            setShowPopupEmail(true);
+            return;
+          }
+          alert(`⚠️ ${dadosBack.erro}`);
           return;
         }
-      } catch (error) { console.error(error); }
-
-      if (formData.password !== formData.confirmPassword) {
-        alert("As senhas precisam ser iguais para avançar.");
+      } catch (error) {
+        alert("Erro de conexão com o servidor de segurança. Verifique se o Back-end está rodando.");
         return;
       }
     }
 
-    // Etapa 2: Dados Jurídicos
+    // dados da empresa
     if (step === 2) {
-      if (!formData.razaoSocial || !formData.nomeFantasia) {
-        alert("Preencha a Razão Social e o Nome Fantasia.");
-        return;
-      }
-      if (!validarCNPJ(formData.cnpj)) {
-        alert("Ops! Esse CNPJ é inválido. Verifique os números.");
+      try {
+        const respostaBack = await fetch('http://localhost:3000/api/empresa/validar-etapa2', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            razaoSocial: formData.razaoSocial,
+            nomeFantasia: formData.nomeFantasia,
+            cnpj: formData.cnpj
+          })
+        });
+        const dadosBack = await respostaBack.json();
+        if (!respostaBack.ok || !dadosBack.valido) {
+          alert(`⚠️ ${dadosBack.erro}`);
+          return;
+        }
+      } catch (error) {
+        alert("Erro de conexão com o servidor de segurança.");
         return;
       }
     }
 
-    // Etapa 3: Responsável Legal e Contato
+    // responsavel legal e contato
     if (step === 3) {
-      if (!formData.nomeResponsavel) {
-        alert("Preencha o nome do responsável pela frota.");
-        return;
-      }
-      if (!validarCPF(formData.cpfResponsavel)) {
-        alert("Ops! O CPF do responsável é inválido.");
-        return;
-      }
-      const telefoneLimpo = formData.telefoneEmpresa.replace(/\D/g, '');
-      if (telefoneLimpo.length < 10) {
-        alert("O número de telefone/WhatsApp parece incorreto.");
+      try {
+        const respostaBack = await fetch('http://localhost:3000/api/empresa/validar-etapa3', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            nomeResponsavel: formData.nomeResponsavel,
+            cpfResponsavel: formData.cpfResponsavel,
+            telefoneEmpresa: formData.telefoneEmpresa
+          })
+        });
+        const dadosBack = await respostaBack.json();
+        if (!respostaBack.ok || !dadosBack.valido) {
+          alert(`⚠️ ${dadosBack.erro}`);
+          return;
+        }
+      } catch (error) {
+        alert("Erro de conexão com o servidor.");
         return;
       }
     }
 
-    // Etapa 4: Endereço
+    // Endereço 
     if (step === 4) {
-      if (!formData.cep || !formData.rua || !formData.numero || !formData.estado || !formData.cidade) {
-        alert("Preencha os campos obrigatórios do endereço.");
+      try {
+        const respostaBack = await fetch('http://localhost:3000/api/empresa/validar-etapa4', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            cep: formData.cep,
+            estado: formData.estado,
+            cidade: formData.cidade,
+            bairro: formData.bairro,
+            rua: formData.rua,
+            numero: formData.numero
+          })
+        });
+        const dadosBack = await respostaBack.json();
+        if (!respostaBack.ok || !dadosBack.valido) {
+          alert(`⚠️ ${dadosBack.erro}`);
+          return;
+        }
+      } catch (error) {
+        alert("Erro de conexão com o servidor.");
         return;
       }
 
@@ -151,65 +191,51 @@ export default function CadastroEmpresa({ irParaLogin, irParaPainel }: CadastroE
     
     setStep(step + 1);
   };
+  
   const prevStep = () => setStep(step - 1);
 
+  // path final
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!formData.termosAceitos) {
       alert("Você precisa aceitar os Termos de Uso para criar a conta da empresa.");
       return;
     }
 
+    setCarregandoFinal(true);
+
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-      const user = userCredential.user;
-
-      const CHAVE_SECRETA = import.meta.env.VITE_alululu;
-
-      // Criptografando dados sensíveis
-      const cnpjCriptografado = CryptoJS.AES.encrypt(formData.cnpj, CHAVE_SECRETA).toString();
-      const cpfResponsavelCriptografado = CryptoJS.AES.encrypt(formData.cpfResponsavel, CHAVE_SECRETA).toString();
-      const nomeResponsavelCriptografado = CryptoJS.AES.encrypt(formData.nomeResponsavel, CHAVE_SECRETA).toString();
-      const telefoneCriptografado = CryptoJS.AES.encrypt(formData.telefoneEmpresa, CHAVE_SECRETA).toString();
-      
-      const cepCriptografado = CryptoJS.AES.encrypt(formData.cep, CHAVE_SECRETA).toString();
-      const estadoCriptografado = CryptoJS.AES.encrypt(formData.estado, CHAVE_SECRETA).toString();
-      const cidadeCriptografada = CryptoJS.AES.encrypt(formData.cidade, CHAVE_SECRETA).toString();
-      const bairroCriptografado = CryptoJS.AES.encrypt(formData.bairro, CHAVE_SECRETA).toString();
-      const ruaCriptografada = CryptoJS.AES.encrypt(formData.rua, CHAVE_SECRETA).toString();
-      const numeroCriptografado = CryptoJS.AES.encrypt(formData.numero, CHAVE_SECRETA).toString();
-      const complementoCriptografado = formData.complemento ? CryptoJS.AES.encrypt(formData.complemento, CHAVE_SECRETA).toString() : "";
-      
-      const latCriptografada = CryptoJS.AES.encrypt(formData.lat, CHAVE_SECRETA).toString();
-      const lngCriptografada = CryptoJS.AES.encrypt(formData.lng, CHAVE_SECRETA).toString();
-
-      // Montando o documento com os GATILHOS do perfil incompleto (60 dias)
-      await setDoc(doc(db, "empresas", user.uid), {
-        razaoSocial: formData.razaoSocial,
-        nomeFantasia: formData.nomeFantasia, 
-        cnpj: cnpjCriptografado,
-        responsavelLegal: {
-          nome: nomeResponsavelCriptografado,
-          cpf: cpfResponsavelCriptografado
-        },
-        telefone: telefoneCriptografado,
-        endereco: {
-          cep: cepCriptografado, estado: estadoCriptografado, cidade: cidadeCriptografada,
-          bairro: bairroCriptografado, rua: ruaCriptografada, numero: numeroCriptografado,
-          complemento: complementoCriptografado, lat: latCriptografada, lng: lngCriptografada
-        },
-        tipo_perfil: "empresa",
-        slug_convite: formData.nomeFantasia.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
-        
-        // MÁGICA DO COMPLIANCE AQUI:
-        data_cadastro: new Date().toISOString(),
-        perfil_completo: false,
-        termos_aceitos: true
+      const respostaCriacao = await fetch('http://localhost:3000/api/empresa/finalizar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          formData: formData 
+        })
       });
 
-      irParaPainel();
+      const dadosCriacao = await respostaCriacao.json();
+
+      if (!respostaCriacao.ok || !dadosCriacao.valido) {
+        alert(`⚠️ Erro de Segurança: ${dadosCriacao.erro}`);
+        setCarregandoFinal(false);
+        return;
+      }
+
+      // auto-login
+      try {
+        await signInWithEmailAndPassword(auth, formData.email, formData.password);
+        irParaPainel();
+      } catch (loginError) {
+        alert("Conta corporativa criada com sucesso! Por favor, faça o login manualmente.");
+        irParaLogin();
+      }
+
     } catch (error: any) {
-      alert("Erro ao finalizar cadastro: " + error.message);
+      alert("Erro crítico de conexão com o servidor.");
+      setCarregandoFinal(false);
     }
   };
 
@@ -223,7 +249,7 @@ export default function CadastroEmpresa({ irParaLogin, irParaPainel }: CadastroE
             <div style={{ ...styles.progress, width: step === 1 ? '20%' : step === 2 ? '40%' : step === 3 ? '60%' : step === 4 ? '80%' : '100%' }}></div>
           </div>
 
-          {/* PASSO 1: ACESSO */}
+          {/* login */}
           {step === 1 && (
             <>
               <h4 style={styles.subTitulo}>1. Credenciais de Acesso</h4>
@@ -237,7 +263,7 @@ export default function CadastroEmpresa({ irParaLogin, irParaPainel }: CadastroE
             </>
           )}
 
-          {/* PASSO 2: EMPRESA */}
+          {/* empresa */}
           {step === 2 && (
             <>
               <h4 style={styles.subTitulo}>2. Dados Jurídicos</h4>
@@ -251,7 +277,7 @@ export default function CadastroEmpresa({ irParaLogin, irParaPainel }: CadastroE
             </>
           )}
 
-          {/* PASSO 3: RESPONSÁVEL LEGAL */}
+          {/* responsavel legal */}
           {step === 3 && (
             <>
               <h4 style={styles.subTitulo}>3. Responsável pela Frota</h4>
@@ -266,7 +292,7 @@ export default function CadastroEmpresa({ irParaLogin, irParaPainel }: CadastroE
             </>
           )}
 
-          {/* PASSO 4: ENDEREÇO */}
+          {/* endereço */}
           {step === 4 && (
             <>
               <h4 style={styles.subTitulo}>4. Endereço da Garagem/Sede</h4>
@@ -287,7 +313,7 @@ export default function CadastroEmpresa({ irParaLogin, irParaPainel }: CadastroE
             </>
           )}
 
-          {/* PASSO 5: SATÉLITE E TERMOS */}
+          {/* coords e termos*/}
           {step === 5 && (
             <>
               <h4 style={styles.subTitulo}>5. Confirmação Final</h4>
@@ -310,7 +336,9 @@ export default function CadastroEmpresa({ irParaLogin, irParaPainel }: CadastroE
 
               <div style={styles.botoes}>
                 <button type="button" onClick={prevStep} style={styles.btnVoltar}>Voltar</button>
-                <button type="submit" style={styles.btnAvancar}>Criar Conta</button>
+                <button type="submit" disabled={carregandoFinal} style={styles.btnAvancar}>
+                  {carregandoFinal ? 'Processando...' : 'Criar Conta'}
+                </button>
               </div>
             </>
           )}

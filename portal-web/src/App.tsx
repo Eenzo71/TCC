@@ -6,6 +6,9 @@ import './style.css';
 import Radar from './Radar';
 import PanfletoDigital from './PanfletoDigital';
 
+import { auth } from './firebaseConfig';
+import { onAuthStateChanged } from 'firebase/auth';
+
 type Tela = 'login' | 'cadastro' | 'sucesso' | 'painel' | 'radar' | 'panfleto';
 
 export default function App() {
@@ -14,6 +17,23 @@ export default function App() {
   const [slugConvite, setSlugConvite] = useState<string | null>(null);
   const [empresaVinculada, setEmpresaVinculada] = useState<string | null>(null);
 
+  const [usuarioLogado, setUsuarioLogado] = useState<boolean>(false);
+  const [verificandoAuth, setVerificandoAuth] = useState<boolean>(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUsuarioLogado(true); // esta logado
+      } else {
+        setUsuarioLogado(false); // não esta logado
+      }
+      setVerificandoAuth(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // effect url convite
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const conviteNaUrl = params.get('convite');
@@ -24,7 +44,7 @@ export default function App() {
     }
   }, []);
 
-  // cronometro pra cutcine
+  // cronometro da Cutscene
   useEffect(() => {
     if (telaAtual === 'sucesso') {
       const timer = setTimeout(() => {
@@ -34,7 +54,9 @@ export default function App() {
     }
   }, [telaAtual]);
 
-  // Telas
+
+  // telas render
+
   if (telaAtual === 'login') {
     return <Login irParaCadastro={() => setTelaAtual('cadastro')} irParaPainel={() => setTelaAtual('painel')} />;
   }
@@ -51,7 +73,6 @@ export default function App() {
 
   if (telaAtual === 'sucesso') {
     return (
-      // div da cutcine
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#111' }}>
         <h1 style={{ color: '#fff', fontSize: '2rem' }}>🎉 Conta criada com sucesso! Preparando o BusGap...</h1>
       </div>
@@ -59,6 +80,18 @@ export default function App() {
   }
 
   if (telaAtual === 'painel') {
+    if (verificandoAuth) { /* sem resposat = sem ver painel */
+      return (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f4f4f9' }}>
+          <h2 style={{ color: '#111' }}>🛡️ Verificando credenciais...</h2>
+        </div>
+      );
+    }
+    if (!usuarioLogado) { /* se erro manda para login */
+      setTimeout(() => setTelaAtual('login'), 0);
+      return null;
+    }
+    /* se ta tudo ok, manda pro painel */
     return <Painel irParaLogin={() => setTelaAtual('login')} irParaRadar={() => setTelaAtual('radar')} />;
   }
 

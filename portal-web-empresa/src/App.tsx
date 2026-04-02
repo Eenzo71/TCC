@@ -1,18 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CadastroEmpresa from './CadastroEmpresa';
 import PainelEmpresa from './PainelEmpresa';
 import PerfilEmpresa from './PerfilEmpresa';
 import CompletarPerfil from './CompletarPerfil';
+import LoginEmpresa from './LoginEmpresa';
 
+import { auth } from './firebaseConfig';
+import { onAuthStateChanged } from 'firebase/auth';
 
-// As rotas do portal da empresa
 type Tela = 'login' | 'cadastro' | 'painel' | 'perfil' | 'completar';
 
 export default function App() {
-  // Já vamos começar na tela de cadastro pra você testar a LingLing Busões direto!
-  const [telaAtual, setTelaAtual] = useState<Tela>('cadastro');
+  const [telaAtual, setTelaAtual] = useState<Tela>('login');
 
-  // --- ROTA DE CADASTRO ---
+  const [usuarioLogado, setUsuarioLogado] = useState<boolean>(false);
+  const [verificandoAuth, setVerificandoAuth] = useState<boolean>(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUsuarioLogado(true);
+        if (sessionStorage.getItem('esperando2FA') !== 'true') {
+          if (telaAtual === 'login' || telaAtual === 'cadastro') {
+            setTelaAtual('painel');
+          }
+        }
+      } else {
+        setUsuarioLogado(false);
+      }
+      setVerificandoAuth(false);
+    });
+
+    return () => unsubscribe();
+  }, [telaAtual]);
+
+  // public telas
+
   if (telaAtual === 'cadastro') {
     return (
       <CadastroEmpresa
@@ -22,7 +45,30 @@ export default function App() {
     );
   }
 
-  // --- ROTA DO PAINEL (Provisória) ---
+  if (telaAtual === 'login') {
+    return (
+      <LoginEmpresa 
+        irParaCadastro={() => setTelaAtual('cadastro')} 
+        irParaPainel={() => setTelaAtual('painel')} 
+      />
+    );
+  }
+
+  // cutcine enquanto firebase processa a autenticação do usuário
+  if (verificandoAuth) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f4f4f9' }}>
+        <h2 style={{ color: '#111' }}>🛡️ Verificando credenciais corporativas...</h2>
+      </div>
+    );
+  }
+ // caso não esteja logado manda pra tela de login
+  if (!usuarioLogado) {
+    setTimeout(() => setTelaAtual('login'), 0); // setTimeout evita erro visual no React
+    return null;
+  }
+
+  // private telas
   if (telaAtual === 'painel') {
     return (
       <PainelEmpresa
@@ -45,29 +91,5 @@ export default function App() {
     return <CompletarPerfil irParaPerfil={() => setTelaAtual('perfil')} />;
   }
 
-  // --- ROTA DE LOGIN (Provisória) ---
-  return (
-    <div style={styles.container}>
-      <h1 style={styles.titulo}>BusGap - Portal das Empresas</h1>
-      <p style={styles.texto}>Gerencie sua frota e seus passageiros.</p>
-
-      {/* Botão falso só pra fazer volume por enquanto */}
-      <button style={styles.btnEntrar}>Entrar no Sistema</button>
-
-      <p style={styles.texto}>Ainda não tem conta?</p>
-      <button onClick={() => setTelaAtual('cadastro')} style={styles.btnCadastrar}>
-        Cadastrar Nova Empresa
-      </button>
-    </div>
-  );
+  return null;
 }
-
-// Estilização básica pra não ficar cego testando
-const styles: { [key: string]: React.CSSProperties } = {
-  container: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', backgroundColor: '#f4f4f9', fontFamily: 'sans-serif' },
-  titulo: { color: '#111', marginBottom: '10px' },
-  texto: { color: '#555', marginBottom: '20px' },
-  btnEntrar: { padding: '12px 24px', marginBottom: '30px', cursor: 'pointer', border: '1px solid #ccc', borderRadius: '8px', fontSize: '16px' },
-  btnCadastrar: { padding: '12px 24px', cursor: 'pointer', backgroundColor: '#111', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: 'bold' },
-  btnSair: { padding: '10px 20px', cursor: 'pointer', backgroundColor: '#d32f2f', color: '#fff', border: 'none', borderRadius: '8px', marginTop: '20px' }
-};
