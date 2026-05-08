@@ -1,7 +1,9 @@
 export function validarMaiorIdade(dataNascimento) {
   if (!dataNascimento) return false;
 
-  const dataNasc = new Date(dataNascimento);
+  const [ano, mes, dia] = dataNascimento.split('-');
+  const dataNasc = new Date(ano, mes - 1, dia);
+
   if (isNaN(dataNasc.getTime())) return false;
 
   const hoje = new Date();

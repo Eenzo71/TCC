@@ -349,4 +349,31 @@ router.post('/completar-perfil', async (req, res) => {
   }
 });
 
+router.get('/:id/escolas', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // pega as empresa no firestone
+    const empresaDoc = await dbAdmin.collection('empresas').doc(id).get();
+
+    if (!empresaDoc.exists) {
+      return res.status(404).json({ valido: false, erro: 'Empresa não encontrada no banco de dados.' });
+    }
+
+    const dados = empresaDoc.data();
+    
+    //se não tiver escolas atendidas, retorna array vazio
+    const escolas = dados.escolas_atendidas || [];
+
+    return res.status(200).json({ 
+      valido: true, 
+      escolas: escolas 
+    });
+
+  } catch (error) {
+    console.error("Erro interno ao buscar escolas da empresa:", error);
+    return res.status(500).json({ valido: false, erro: 'Erro interno no servidor ao tentar ler as instituições.' });
+  }
+});
+
 export default router;
