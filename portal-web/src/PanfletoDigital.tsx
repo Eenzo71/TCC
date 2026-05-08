@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 
 interface PanfletoProps {
   slugConvite: string;
-  irParaCadastroResponsavel: (empresaId: string) => void;
-  irParaCadastroAlunoMaior: (empresaId: string) => void;
+  irParaCadastroResponsavel: () => void;
+  irParaCadastroAlunoMaior: () => void;
 }
 
 export default function PanfletoDigital({ slugConvite, irParaCadastroResponsavel, irParaCadastroAlunoMaior }: PanfletoProps) {
@@ -23,35 +23,62 @@ export default function PanfletoDigital({ slugConvite, irParaCadastroResponsavel
           setErro(dados.erro || 'Convite não encontrado.');
         }
       } catch (error) {
-        console.error("Erro ao buscar convite no servidor:", error);
         setErro('Erro de conexão com o servidor do BusGap.');
       } finally {
         setCarregando(false);
       }
     };
 
-    if (slugConvite) buscarEmpresa();
+    if (slugConvite) {
+      buscarEmpresa();
+    } else {
+      setCarregando(false);
+    }
   }, [slugConvite]);
 
-  if (carregando) return <div style={styles.telaInteira}>Carregando convite...</div>;
+  const handleCadastroResponsavel = () => {
+    if (empresa) {
+      localStorage.setItem('empresa_vinculada', empresa.id);
+    } else {
+      localStorage.removeItem('empresa_vinculada'); 
+    }
+    irParaCadastroResponsavel();
+  };
+
+  const handleCadastroMaior = () => {
+    if (empresa) {
+      localStorage.setItem('empresa_vinculada', empresa.id);
+    } else {
+      localStorage.removeItem('empresa_vinculada');
+    }
+    irParaCadastroAlunoMaior();
+  };
+
+  if (carregando) return <div style={styles.telaInteira}>Carregando...</div>;
   if (erro) return <div style={styles.telaInteira}><h2 style={{ color: '#d32f2f' }}>{erro}</h2></div>;
+
+  const tituloSecundario = empresa ? 'Convite Oficial' : 'Bem-vindo ao BusGap';
+  const tituloPrincipal = empresa ? empresa.nomeFantasia : 'Escolha seu Perfil';
+  const descricao = empresa 
+    ? 'Escolha o seu perfil abaixo para se vincular à frota.' 
+    : 'Escolha seu perfil. Você poderá vincular-se a uma van depois usando um código escolar.';
 
   return (
     <div style={styles.telaInteira}>
       <div style={styles.panfleto}>
         <div style={styles.cabecalho}>
-          <h3 style={{ color: '#4caf50', margin: 0 }}>Convite Oficial</h3>
-          <h1 style={{ color: '#111', marginTop: '10px' }}>{empresa?.nomeFantasia}</h1>
-          <p style={{ color: '#555' }}>Escolha o seu perfil abaixo para se vincular à frota.</p>
+          <h3 style={{ color: '#4caf50', margin: 0 }}>{tituloSecundario}</h3>
+          <h1 style={{ color: '#111', marginTop: '10px' }}>{tituloPrincipal}</h1>
+          <p style={{ color: '#555' }}>{descricao}</p>
         </div>
 
         <div style={styles.botoesContainer}>
-          <button onClick={() => irParaCadastroResponsavel(empresa.id)} style={styles.btnPrimario}>
+          <button onClick={handleCadastroResponsavel} style={styles.btnPrimario}>
             👨‍👩‍👧 Cadastro de Pais / Responsáveis
             <span style={styles.subTextoBtn}>Para cadastrar seus filhos no transporte</span>
           </button>
 
-          <button onClick={() => irParaCadastroAlunoMaior(empresa.id)} style={styles.btnSecundario}>
+          <button onClick={handleCadastroMaior} style={styles.btnSecundario}>
             🎓 Cadastro de Aluno (+18)
             <span style={styles.subTextoBtn}>Para universitários ou maiores de idade</span>
           </button>

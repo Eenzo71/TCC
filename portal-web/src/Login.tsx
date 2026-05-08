@@ -4,11 +4,11 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import './style.css';
 
 interface LoginProps {
-  irParaCadastro: () => void;
+  irParaPanfleto: () => void;
   irParaPainel: () => void;
 }
 
-export default function Login({ irParaCadastro, irParaPainel }: LoginProps) {
+export default function Login({ irParaPanfleto, irParaPainel }: LoginProps) {
   const [email, setEmail] = useState(sessionStorage.getItem('emailBusGap') || '');
   const [password, setPassword] = useState('');
 
@@ -50,7 +50,7 @@ export default function Login({ irParaCadastro, irParaPainel }: LoginProps) {
           <div className="links-rodape">
             <a href="#">esqueceu a senha?</a>
             <span className="divisor">|</span>
-            <a href="#" onClick={(e) => { e.preventDefault(); irParaCadastro(); }}>cadastrar-se</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); irParaPanfleto(); }}>cadastrar-se</a>
           </div>
         </div>
       </div>

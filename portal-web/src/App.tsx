@@ -3,18 +3,21 @@ import Login from './Login';
 import Cadastro from './Cadastro';
 import Painel from './Painel';
 import './style.css';
-import Radar from './Radar';
 import PanfletoDigital from './PanfletoDigital';
+import Radar from './TelaRadar';
+import CadastroAlunoMaior from './CadastroAlunoMaior';
+import AdicionarDependente from './AdicionarDependente';
 
 import { auth } from './firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 
-type Tela = 'login' | 'cadastro' | 'sucesso' | 'painel' | 'radar' | 'panfleto';
+type Tela = 'login' | 'cadastro' | 'sucesso' | 'painel' | 'radar' | 'panfleto' | 'cadastro-maior';
 
 export default function App() {
   const [telaAtual, setTelaAtual] = useState<Tela>('login');
-  
+
   const [slugConvite, setSlugConvite] = useState<string | null>(null);
+  
   const [empresaVinculada, setEmpresaVinculada] = useState<string | null>(null);
 
   const [usuarioLogado, setUsuarioLogado] = useState<boolean>(false);
@@ -23,9 +26,15 @@ export default function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setUsuarioLogado(true); // esta logado
+        setUsuarioLogado(true);
+
+        setTelaAtual((telaAnterior) => telaAnterior === 'login' ? 'painel' : telaAnterior);
       } else {
-        setUsuarioLogado(false); // não esta logado
+        setUsuarioLogado(false);
+
+        setTelaAtual((telaAnterior) =>
+          (telaAnterior === 'painel' || telaAnterior === 'radar') ? 'login' : telaAnterior
+        );
       }
       setVerificandoAuth(false);
     });
@@ -48,29 +57,40 @@ export default function App() {
   useEffect(() => {
     if (telaAtual === 'sucesso') {
       const timer = setTimeout(() => {
-        setTelaAtual('painel'); 
-      }, 3000); 
+        setTelaAtual('painel');
+      }, 3000);
       return () => clearTimeout(timer);
     }
   }, [telaAtual]);
 
-
-  // telas render
+  if (verificandoAuth) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#e8effd' }}>
+        <h2 style={{ color: '#1a237e' }}>🛡️ Verificando sessão...</h2>
+      </div>
+    );
+  }
 
   if (telaAtual === 'login') {
-    return <Login irParaCadastro={() => setTelaAtual('cadastro')} irParaPainel={() => setTelaAtual('painel')} />;
+    return <Login irParaPanfleto={() => setTelaAtual('panfleto')} irParaPainel={() => setTelaAtual('painel')} />;
   }
 
   if (telaAtual === 'cadastro') {
     return (
-      <Cadastro 
-        irParaLogin={() => setTelaAtual('login')} 
-        irParaSucesso={() => setTelaAtual('sucesso')} 
+      <Cadastro
+        irParaLogin={() => setTelaAtual('login')}
+        irParaSucesso={() => setTelaAtual('sucesso')}
         empresaId={empresaVinculada}
       />
     );
   }
 
+  if (telaAtual === 'cadastro-maior') {
+    return <CadastroAlunoMaior 
+      irParaPainel={() => setTelaAtual('painel')} 
+      irParaVoltar={() => setTelaAtual('panfleto')}
+    />;
+  }
   if (telaAtual === 'sucesso') {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#111' }}>
@@ -80,33 +100,33 @@ export default function App() {
   }
 
   if (telaAtual === 'painel') {
-    if (verificandoAuth) { /* sem resposat = sem ver painel */
+    if (verificandoAuth) {
       return (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f4f4f9' }}>
           <h2 style={{ color: '#111' }}>🛡️ Verificando credenciais...</h2>
         </div>
       );
     }
-    if (!usuarioLogado) { /* se erro manda para login */
+    if (!usuarioLogado) {
       setTimeout(() => setTelaAtual('login'), 0);
       return null;
     }
-    /* se ta tudo ok, manda pro painel */
-    return <Painel irParaLogin={() => setTelaAtual('login')} irParaRadar={() => setTelaAtual('radar')} />;
+    return <Painel
+      irParaLogin={() => setTelaAtual('login')}
+      irParaRadar={() => setTelaAtual('radar')}
+    />;
   }
 
-  if (telaAtual === 'panfleto' && slugConvite) {
+  if (telaAtual === 'radar') {
+    return <Radar irParaPainel={() => setTelaAtual('painel')} />;
+  }
+
+  if (telaAtual === 'panfleto') {
     return (
-      <PanfletoDigital 
-        slugConvite={slugConvite}
-        irParaCadastroResponsavel={(empresaId) => {
-          setEmpresaVinculada(empresaId);
-          setTelaAtual('cadastro'); 
-        }}
-        irParaCadastroAlunoMaior={(empresaId) => {
-          setEmpresaVinculada(empresaId); 
-          setTelaAtual('cadastro'); 
-        }}
+      <PanfletoDigital
+        slugConvite={slugConvite || ''}
+        irParaCadastroResponsavel={() => setTelaAtual('cadastro')}
+        irParaCadastroAlunoMaior={() => setTelaAtual('cadastro-maior')}
       />
     );
   }
