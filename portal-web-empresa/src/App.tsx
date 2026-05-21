@@ -4,11 +4,12 @@ import PainelEmpresa from './PainelEmpresa';
 import PerfilEmpresa from './PerfilEmpresa';
 import CompletarPerfil from './CompletarPerfil';
 import LoginEmpresa from './LoginEmpresa';
+import maparadar from './MapaRadar';
 
 import { auth } from './firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 
-type Tela = 'login' | 'cadastro' | 'painel' | 'perfil' | 'completar';
+type Tela = 'login' | 'cadastro' | 'painel' | 'perfil' | 'completar' | 'maparadar';
 
 export default function App() {
   const [telaAtual, setTelaAtual] = useState<Tela>('login');
