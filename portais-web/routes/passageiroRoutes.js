@@ -100,7 +100,7 @@ router.post('/cadastrar-maior', async (req, res) => {
       throw new Error("Acesso negado: O passageiro precisa ter 18 anos completos ou mais.");
     }
 
-    const CHAVE = process.env.CHAVE_SECRETA_BANCO || "alululu";
+    const CHAVE = process.env.CHAVE_alululu;
     const criptografar = (texto) => texto ? CryptoJS.AES.encrypt(String(texto), CHAVE).toString() : "";
 
     const userRecord = await authAdmin.createUser({
@@ -161,7 +161,7 @@ router.post('/cadastrar-dependente', async (req, res) => {
       return res.status(400).json({ valido: false, erro: 'Preencha todos os campos obrigatórios.' });
     }
 
-    const CHAVE = process.env.CHAVE_SECRETA_BANCO || "alululu";
+    const CHAVE = process.env.CHAVE_alululu;
     const criptografar = (texto) => texto ? CryptoJS.AES.encrypt(String(texto), CHAVE).toString() : "";
 
     const turmaFinal = turma === 'outra' ? turmaManual : turma;
