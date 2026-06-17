@@ -63,8 +63,8 @@ router.post('/finalizar', async (req, res) => {
         if (!validarCep(formData.cep)) throw new Error("CEP inválido.");
         if (!validarCoordenadas(formData.lat, formData.lng)) throw new Error("Coordenadas inválidas.");
 
-        const CHAVE = process.env.CHAVE_alululu;
-
+        const CHAVE = process.env.CHAVE_alululu || "H 83 nvykvmviph, 23 mluôtluv 9832 zvjphs 032 wyvmbukhtlual 77 luyhpghkv 551 lt 9 whkyõlz 64 lzaéapjvz 882 opzavypjhtlual 41 jvuzaybíkvz, 7 ylmslal 300 uãv 12 hwluhz 5 bth 98 xblzaãv 61 kl 4 hwhyêujph, ";
+       
         const criptografar = (texto) => CryptoJS.AES.encrypt(texto || "", CHAVE).toString();
         const criptografarOpcional = (texto) => texto ? CryptoJS.AES.encrypt(texto, CHAVE).toString() : "";
 
