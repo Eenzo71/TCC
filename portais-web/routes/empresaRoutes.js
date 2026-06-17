@@ -111,7 +111,7 @@ router.post('/finalizar', async (req, res) => {
     if (!validarCPF(formData.cpfResponsavel)) throw new Error("CPF do responsável inválido.");
     if (!validarCep(formData.cep)) throw new Error("CEP inválido.");
 
-    const CHAVE = process.env.CHAVE_SECRETA_BANCO || "alululu";
+    const CHAVE = process.env.CHAVE_alululu;
     const criptografar = (texto) => CryptoJS.AES.encrypt(String(texto || ""), CHAVE).toString();
     const criptografarOpcional = (texto) => texto ? CryptoJS.AES.encrypt(String(texto), CHAVE).toString() : "";
 
@@ -260,7 +260,7 @@ router.post('/completar-perfil', async (req, res) => {
     }
 
     // criptografia...
-    const CHAVE = process.env.CHAVE_SECRETA_BANCO || "alululu";
+    const CHAVE = process.env.CHAVE_alululu;
     const criptografar = (texto) => texto ? CryptoJS.AES.encrypt(String(texto), CHAVE).toString() : "";
 
     // dossie

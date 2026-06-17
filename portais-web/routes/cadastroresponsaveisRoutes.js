@@ -103,4 +103,54 @@ router.post('/finalizar', async (req, res) => {
     }
 });
 
+// Rota para listar alunos vinculados à empresa (para o mapa)
+router.get('/empresa/:empresaId/alunos', async (req, res) => {
+    const { empresaId } = req.params;
+
+    try {
+        let snapshot = await dbAdmin.collection('passageiros').where('empresa_id', '==', empresaId).get();
+
+        if (snapshot.size === 0) {
+            snapshot = await dbAdmin.collection('passageiros').where('empresa_vinculada', '==', empresaId).get();
+        }
+
+        const CHAVE = process.env.CHAVE_alululu;
+
+        const descriptografar = (textoCifrado) => {
+            if (!textoCifrado) return "";
+            try {
+                const bytes = CryptoJS.AES.decrypt(textoCifrado, CHAVE);
+                return bytes.toString(CryptoJS.enc.Utf8);
+            } catch (e) {
+                return "";
+            }
+        };
+
+        const listaAlunos = [];
+
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            
+            const latOriginal = data.endereco_embarque?.lat ? descriptografar(data.endereco_embarque.lat) : null;
+            const lngOriginal = data.endereco_embarque?.lng ? descriptografar(data.endereco_embarque.lng) : null;
+
+            if (latOriginal && lngOriginal) {
+                listaAlunos.push({
+                    id: doc.id,
+                    nome: data.nome_passageiro || "Aluno Sem Nome", 
+                    bairro: data.endereco_embarque?.bairro ? descriptografar(data.endereco_embarque.bairro) : "",
+                    lat: Number(latOriginal),
+                    lng: Number(lngOriginal)
+                });
+            }
+        });
+
+        return res.status(200).json(listaAlunos);
+
+    } catch (error) {
+        console.error('❌ Erro interno ao listar alunos para o mapa:', error);
+        return res.status(500).json({ erro: 'Erro interno no servidor.' });
+    }
+});
+
 export default router;
