@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { auth, db } from './firebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
-import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc, collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+
 import GestaoEscolas from './GestaoEscolas';
+import MapaRadar from './MapaRadar';
+import MapaRoteirizacao from './MapaRoteirizacao';
+
+const Icon = ({ name }: { name: string }) => <span style={{ marginRight: '10px' }}>{name}</span>;
 
 interface PainelEmpresaProps {
   irParaLogin: () => void;
@@ -12,148 +17,207 @@ interface PainelEmpresaProps {
 export default function PainelEmpresa({ irParaLogin, irParaPerfil }: PainelEmpresaProps) {
   const [empresa, setEmpresa] = useState<any>(null);
   const [carregando, setCarregando] = useState(true);
-  const [linkCopiado, setLinkCopiado] = useState(false);
-  const [diasRestantes, setDiasRestantes] = useState<number>(60);
-  
-  const [telaLocal, setTelaLocal] = useState<'painel' | 'escolas'>('painel');
+  const [abaAtiva, setAbaAtiva] = useState<'monitoramento' | 'roteirizacao' | 'escolas' | 'ajustes'>('monitoramento');
+
+  // Estados de Logística
+  const [viagensHoje, setViagensHoje] = useState<any[]>([]);
+  const [viagemSelecionada, setViagemSelecionada] = useState<any>(null);
+  const [pontosTimeline, setPontosTimeline] = useState<any[]>([]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const docRef = doc(db, "empresas", user.uid);
         const docSnap = await getDoc(docRef);
-        
         if (docSnap.exists()) {
-          const dados = docSnap.data();
-          setEmpresa({ id: docSnap.id, ...dados });
-
-          if (dados.data_cadastro && !dados.perfil_completo) {
-            const dataCadastro = new Date(dados.data_cadastro);
-            const hoje = new Date();
-            const diffTime = hoje.getTime() - dataCadastro.getTime();
-            const diasPassados = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            
-            setDiasRestantes(60 - diasPassados);
-          }
+          setEmpresa({ id: docSnap.id, ...docSnap.data() });
+          buscarViagensDoDia(user.uid);
         }
       } else {
         irParaLogin();
       }
       setCarregando(false);
     });
-
     return () => unsubscribe();
   }, []);
 
-  const copiarLink = () => {
-    if (empresa && empresa.slug_convite) {
-      const linkBase = `http://localhost:5173/?convite=${empresa.slug_convite}`;
-      navigator.clipboard.writeText(linkBase);
-      setLinkCopiado(true);
-      setTimeout(() => setLinkCopiado(false), 3000);
-    }
+  // Busca as viagens inciadas no dia
+  const buscarViagensDoDia = async (empresaId: string) => {
+    const q = query(
+      collection(db, "viagens"),
+      where("empresa_id", "==", empresaId),
+      orderBy("horario_inicio", "desc"),
+      limit(10)
+    );
+    const snap = await getDocs(q);
+    const lista = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    setViagensHoje(lista);
   };
 
-  const handleSair = async () => {
-    await auth.signOut();
-    irParaLogin();
+  // Quando clica em uma viagem, busca os pontos no mapa
+  const carregarLinhaDoTempo = async (viagem: any) => {
+    setViagemSelecionada(viagem);
+    const q = query(
+      collection(db, "viagens", viagem.id, "rastreamento"),
+      orderBy("timestamp", "asc")
+    );
+    const snap = await getDocs(q);
+    setPontosTimeline(snap.docs.map(d => d.data()));
   };
 
-  if (carregando) return <div style={styles.telaInteira}><p>Carregando sistema...</p></div>;
-
-  const contaBloqueada = !empresa?.perfil_completo && diasRestantes <= 0;
+  if (carregando) return <div style={styles.loading}>Carregando BusGap Business...</div>;
 
   return (
-    <div style={styles.telaInteira}>
-      
-      {!empresa?.perfil_completo && !contaBloqueada && (
-        <div style={styles.bannerAviso}>
-          ⚠️ <strong>Atenção:</strong> Seu perfil empresarial está incompleto. Você tem <strong>{diasRestantes} dias</strong> para enviar seus documentos antes que o link de convite seja bloqueado.
-          <button onClick={irParaPerfil} style={styles.btnBanner}>⚙️ Configurações</button>
+    <div style={styles.containerDashboard}>
+
+      {/* SIDEBAR */}
+      <aside style={styles.sidebar}>
+        <div style={styles.logo}>BUSGAP <span style={{ fontSize: '10px', color: '#4caf50' }}>CORP</span></div>
+
+        <nav style={styles.nav}>
+          <button style={abaAtiva === 'monitoramento' ? styles.navBtnAtivo : styles.navBtn} onClick={() => setAbaAtiva('monitoramento')}>
+            <Icon name="📡" /> Radar e Logística
+          </button>
+          <button style={abaAtiva === 'roteirizacao' ? styles.navBtnAtivo : styles.navBtn} onClick={() => setAbaAtiva('roteirizacao')}>
+            <Icon name="🗺️" /> Roteirização de Rotas
+          </button>
+          <button style={abaAtiva === 'escolas' ? styles.navBtnAtivo : styles.navBtn} onClick={() => setAbaAtiva('escolas')}>
+            <Icon name="🏫" /> Escolas e Turmas
+          </button>
+          <button style={abaAtiva === 'ajustes' ? styles.navBtnAtivo : styles.navBtn} onClick={() => setAbaAtiva('ajustes')}>
+            <Icon name="🔗" /> Link de Convite
+          </button>
+        </nav>
+
+        <div style={styles.sidebarFooter}>
+          <button onClick={() => signOut(auth)} style={styles.btnSair}>Sair</button>
         </div>
-      )}
+      </aside>
 
-      {contaBloqueada && (
-        <div style={styles.bannerBloqueado}>
-          ⛔ <strong>Conta Restrita:</strong> O prazo para envio de documentos expirou. O cadastro de novos alunos está suspenso.
-          <button style={styles.btnBannerBloqueado}>Enviar Documentos</button>
-        </div>
-      )}
+      {/* PRINCIPAL */}
+      <main style={styles.mainContent}>
 
-      {telaLocal === 'painel' ? (
-        <div style={styles.painelCard}>
-          <h1 style={{ color: '#111', fontSize: '24px', marginBottom: '5px' }}>🏢 Painel de Controle</h1>
-          <h2 style={{ color: '#4caf50', margin: '0 0 20px 0' }}>{empresa?.nomeFantasia}</h2>
-          <p style={{ color: '#777', fontSize: '12px', marginTop: '-15px', marginBottom: '30px' }}>
-            Razão Social: {empresa?.razaoSocial}
-          </p>
+        {/* CABEÇAI */}
+        <header style={styles.header}>
+          <div>
+            <h1 style={{ margin: 0, fontSize: '20px' }}>Dashboard Administrativo</h1>
+            <p style={{ margin: 0, fontSize: '14px', color: '#666' }}>{empresa?.nomeFantasia}</p>
+          </div>
+          <div style={styles.statusBadge}>Operação Normal</div>
+        </header>
 
-          {!contaBloqueada ? (
-            <>
-              <div style={styles.cardConvite}>
-                <h3 style={{ marginBottom: '10px' }}>📄 Panfleto Digital</h3>
-                <p style={{ color: '#555', fontSize: '14px', marginBottom: '15px' }}>
-                  Compartilhe este link com os pais e alunos. Quem se cadastrar por ele será vinculado automaticamente à sua frota.
-                </p>
-                
-                <div style={styles.caixaLink}>
-                  <span style={{ color: '#888' }}>http://localhost:5173/?convite=</span>
-                  <span style={{ fontWeight: 'bold', color: '#111' }}>{empresa?.slug_convite}</span>
+        {/* ÁREA DAS ABAS */}
+        <div style={styles.contentArea}>
+
+          {abaAtiva === 'monitoramento' && (
+            <div style={styles.gridMonitoramento}>
+
+              {/* MAPA */}
+              <div style={styles.colunaMapa}>
+                <div style={styles.cardMapa}>
+                  <MapaRadar pontosTimeline={pontosTimeline} />
                 </div>
 
-                <button onClick={copiarLink} style={styles.btnCopiar}>
-                  {linkCopiado ? '✅ Link Copiado!' : '🔗 Copiar Link de Convite'}
-                </button>
+                <div style={styles.miniStatsRow}>
+                  <div style={styles.miniCard}><strong>12</strong> Alunos em Trânsito</div>
+                  <div style={styles.miniCard}><strong>02</strong> Vans Ativas</div>
+                </div>
               </div>
 
-              <button 
-                onClick={() => setTelaLocal('escolas')} 
-                style={styles.btnEscolas}
-              >
-                🏫 Gerenciar Escolas e Turmas
-              </button>
-            </>
-          ) : (
-            <div style={{ padding: '30px', backgroundColor: '#ffebee', borderRadius: '10px', marginBottom: '30px', border: '1px dashed #d32f2f' }}>
-              <h3 style={{ color: '#d32f2f' }}>Acesso Suspenso</h3>
-              <p style={{ color: '#555', fontSize: '14px' }}>Complete a verificação da sua empresa para voltar a gerenciar sua frota pelo BusGap.</p>
+              {/* TIMELINE */}
+              <div style={styles.colunaTimeline}>
+                <h3 style={{ marginTop: 0, fontSize: '16px' }}>Histórico de Viagens (Hoje)</h3>
+                <div style={styles.listaViagens}>
+                  {viagensHoje.map(v => (
+                    <div
+                      key={v.id}
+                      onClick={() => carregarLinhaDoTempo(v)}
+                      style={viagemSelecionada?.id === v.id ? styles.itemViagemAtivo : styles.itemViagem}
+                    >
+                      <div style={{ fontWeight: 'bold' }}>Van #{v.motorista_id.substring(0, 5)}</div>
+                      <div style={{ fontSize: '11px', color: '#888' }}>Início: {new Date(v.horario_inicio).toLocaleTimeString()}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {viagemSelecionada && (
+                  <div style={styles.detalheTimeline}>
+                    <h4 style={{ fontSize: '13px', color: '#1a237e' }}>Linha do Tempo</h4>
+                    <div style={styles.timelineVertical}>
+                      <div style={styles.pontoTimeline}>🟢 {new Date(viagemSelecionada.horario_inicio).toLocaleTimeString()} - Viagem Iniciada</div>
+                      {pontosTimeline.map((p, i) => (
+                        <div key={i} style={styles.pontoTimeline}>📍 {new Date(p.timestamp).toLocaleTimeString()} - Ponto de GPS</div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
             </div>
           )}
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
-            <button style={styles.btnSecundario} onClick={irParaPerfil}>⚙️ Configurações</button>
-            <button onClick={handleSair} style={styles.btnSair}>Sair do Sistema</button>
-          </div>
-        </div>
-      ) : (
-        <div style={styles.painelCardMaior}>
-          <button onClick={() => setTelaLocal('painel')} style={{ ...styles.btnSecundario, marginBottom: '20px' }}>
-            ⬅ Voltar ao Painel
-          </button>
-          <GestaoEscolas />
-        </div>
-      )}
+          {abaAtiva === 'roteirizacao' && (
+            <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <h2 style={{ marginTop: 0, color: '#1a237e' }}>Planejamento de Rotas</h2>
+              <p style={{ color: '#666', marginBottom: '20px' }}>
+                Visualize a localização de todos os alunos vinculados à sua empresa para otimizar as frotas.
+              </p>
+              <div style={{ flex: 1, backgroundColor: '#fff', borderRadius: '15px', overflow: 'hidden', border: '5px solid #fff', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }}>
+                <MapaRoteirizacao empresaId={empresa?.id} empresa={empresa} />
+              </div>
+            </div>
+          )}
 
+          {abaAtiva === 'escolas' && <GestaoEscolas />}
+
+          {abaAtiva === 'ajustes' && (
+            <div style={styles.cardInviteFull}>
+              <h3>Link do Panfleto Digital</h3>
+              <p>Compartilhe para vincular passageiros automaticamente.</p>
+              <div style={styles.caixaLink}>http://localhost:5174/?convite={empresa?.slug_convite}</div>
+              <button style={styles.btnCopiar}>Copiar Link</button>
+            </div>
+          )}
+
+        </div>
+      </main>
     </div>
   );
 }
 
 const styles: { [key: string]: React.CSSProperties } = {
-  telaInteira: { display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh', backgroundColor: '#f4f4f9', fontFamily: 'sans-serif' },
-  bannerAviso: { width: '100%', backgroundColor: '#fff9c4', color: '#f57f17', padding: '15px', textAlign: 'center', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' },
-  btnBanner: { backgroundColor: '#f57f17', color: '#fff', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' },
-  bannerBloqueado: { width: '100%', backgroundColor: '#d32f2f', color: '#fff', padding: '15px', textAlign: 'center', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' },
-  btnBannerBloqueado: { backgroundColor: '#fff', color: '#d32f2f', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' },
-  
-  painelCard: { width: '600px', padding: '40px', backgroundColor: '#fff', borderRadius: '15px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', textAlign: 'center', marginTop: '40px' },
-  painelCardMaior: { width: '900px', maxWidth: '95vw', padding: '40px', backgroundColor: '#fff', borderRadius: '15px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', marginTop: '40px', marginBottom: '40px' },
-  
-  cardConvite: { backgroundColor: '#f9f9f9', padding: '20px', borderRadius: '10px', border: '1px dashed #ccc', marginBottom: '20px' },
-  caixaLink: { backgroundColor: '#eaeaea', padding: '10px', borderRadius: '8px', marginBottom: '15px', fontFamily: 'monospace', fontSize: '15px', overflowX: 'auto', whiteSpace: 'nowrap' },
-  btnCopiar: { width: '100%', padding: '12px', backgroundColor: '#111', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' },
-  
-  btnEscolas: { width: '100%', padding: '15px', backgroundColor: '#1a237e', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', marginBottom: '20px', boxShadow: '0 4px 10px rgba(26, 35, 126, 0.2)' },
-  
-  btnSecundario: { padding: '10px 20px', backgroundColor: '#eee', color: '#333', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' },
-  btnSair: { padding: '10px 20px', backgroundColor: 'transparent', color: '#d32f2f', border: '1px solid #d32f2f', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }
+  containerDashboard: { display: 'flex', height: '100vh', width: '100vw', backgroundColor: '#f0f2f5', overflow: 'hidden' },
+  sidebar: { width: '260px', backgroundColor: '#1a237e', color: '#fff', display: 'flex', flexDirection: 'column', padding: '20px' },
+  logo: { fontSize: '24px', fontWeight: 'bold', marginBottom: '40px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '10px' },
+  nav: { flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' },
+  navBtn: { background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', textAlign: 'left', padding: '12px', cursor: 'pointer', borderRadius: '8px', fontSize: '15px' },
+  navBtnAtivo: { background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', textAlign: 'left', padding: '12px', cursor: 'pointer', borderRadius: '8px', fontWeight: 'bold' },
+  sidebarFooter: { paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.1)' },
+  btnSair: { width: '100%', padding: '10px', background: '#d32f2f', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer' },
+
+  mainContent: { flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' },
+  header: { height: '70px', backgroundColor: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 30px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' },
+  statusBadge: { backgroundColor: '#e8f5e9', color: '#2e7d32', padding: '5px 15px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' },
+
+  contentArea: { padding: '25px', flex: 1 },
+  gridMonitoramento: { display: 'grid', gridTemplateColumns: '1fr 320px', gap: '20px', height: '100%' },
+  colunaMapa: { display: 'flex', flexDirection: 'column', gap: '20px' },
+  cardMapa: { backgroundColor: '#fff', borderRadius: '15px', overflow: 'hidden', height: '450px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', border: '5px solid #fff' },
+
+  colunaTimeline: { backgroundColor: '#fff', borderRadius: '15px', padding: '20px', display: 'flex', flexDirection: 'column', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' },
+  listaViagens: { flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' },
+  itemViagem: { padding: '12px', borderRadius: '10px', backgroundColor: '#f8f9fa', cursor: 'pointer', border: '1px solid #eee' },
+  itemViagemAtivo: { padding: '12px', borderRadius: '10px', backgroundColor: '#e8effd', cursor: 'pointer', border: '1px solid #1a237e' },
+
+  detalheTimeline: { borderTop: '1px solid #eee', paddingTop: '15px' },
+  timelineVertical: { display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto' },
+  pontoTimeline: { fontSize: '11px', color: '#555', paddingLeft: '10px', borderLeft: '2px solid #ddd' },
+
+  miniStatsRow: { display: 'flex', gap: '15px' },
+  miniCard: { flex: 1, backgroundColor: '#fff', padding: '15px', borderRadius: '12px', textAlign: 'center', fontSize: '14px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' },
+
+  loading: { height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#f4f4f9' },
+  cardInviteFull: { backgroundColor: '#fff', padding: '40px', borderRadius: '15px', textAlign: 'center' },
+  caixaLink: { backgroundColor: '#f0f0f0', padding: '15px', borderRadius: '10px', margin: '20px 0', fontFamily: 'monospace' },
+  btnCopiar: { padding: '10px 30px', backgroundColor: '#111', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }
 };
