@@ -1,10 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@200..900&display=swap');
+
 *{
     box-sizing: border-box;
 }
 
 body{
     margin: 0;
-    background: rgb(238, 238, 238);
+    background: #d1e3ff;
 }
 
 .container{
@@ -15,9 +17,10 @@ body{
 }
 
 .top-bar{
-    background: linear-gradient(to right, #1e90ff, #2f7ed8);
+    background: linear-gradient(to right, #ffffff, #ffffff);
     padding: 15px 0;
-    box-shadow: 2px 2px 4px;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1); 
+    font-family: 'Unbounded', sans-serif;
 }
 
 .top-bar h1{
@@ -40,9 +43,10 @@ body{
 }
 
 .log{
-    background: #9ec3e6; 
+    background: #ffffff8d; 
     padding: 50px 40px;
-    border-radius: 20px; 
+    border-radius: 20px;
+    border: 2px solid white;
     width: 400px;
     text-align: center;
 }
@@ -50,12 +54,13 @@ body{
 .log h3 {
     margin: 0;
     font-size: 24px;
-    text-align: left;
+    text-align: center;
+    color: rgb(0, 0, 0);
+    font-family: 'Unbounded', sans-serif;
 }
 
 .linha-titulo {
     border: none;
-    border-top: 2px solid black;
     margin: 10px 0 30px 0;
 }
 
@@ -73,17 +78,20 @@ body{
 }
 
 #login-form input[type="submit"] {
-    background: #111;
-    color: white;
+    background: #ffffff;
+    color: rgb(0, 0, 0);
     border: none;
     padding: 14px 50px;
     border-radius: 10px;
     cursor: pointer;
     font-weight: bold;
+    transition: 0.7s;
+    font-family: 'Unbounded', sans-serif;
 }
 
 #login-form input[type="submit"]:hover {
-    background: #333;
+    background: #0b00a8;
+    color:aliceblue
 }
 
 .links-rodape {
@@ -91,16 +99,19 @@ body{
     justify-content: center;
     align-items: center;
     gap: 15px;
-    font-size: 13px;
+    font-size: 8px;
+    font-family: 'Unbounded', sans-serif;
 }
 
 .links-rodape a {
     text-decoration: none;
-    color: #222;
+    color: #000000;
+    transition: 0.5s;
 }
 
 .links-rodape a:hover {
-    text-decoration: underline;
+    text-shadow: rgb(0, 5, 149) 0px 0px 8px;
+    color:white;
 }
 
 .links-rodape .divisor {

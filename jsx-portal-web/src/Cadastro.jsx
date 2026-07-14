@@ -88,7 +88,7 @@ export default function Cadastro({ irParaSucesso, irParaLogin }) {
             </div>
             <input type="text" name="complemento" placeholder="Complemento" value={formData.complemento} onChange={handleChange} style={inputStyle} />
             
-            <div style={{ width: '100%', height: '150px', backgroundColor: '#ccc', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px', borderRadius: '5px' }}>
+            <div style={{ width: '100%', height: '150px', backgroundColor: '#ff0000', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px', borderRadius: '5px' }}>
               <p style={{ color: '#555', textAlign: 'center', padding: '10px' }}>Quadrado do mapa...</p>
             </div>
 

@@ -35,7 +35,7 @@ export default function Login({ irParaPanfleto, irParaPainel }: LoginProps) {
       </div>
       <div className="main-content">
         <div className="foto">
-          <img src="/images/bus-image.png" alt="Bus Image" />
+          <img src="/images/bus_gap_sem_fundo.png" alt="Bus Image" />
         </div>
         <div className="log">
           <h3 id="login">Login</h3>
