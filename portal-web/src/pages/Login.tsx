@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { auth } from './firebaseConfig';
+import { auth } from "../firebaseConfig";
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import './style.css';
+import '../style.css';
 
 interface LoginProps {
   irParaPanfleto: () => void;

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { auth } from './firebaseConfig';
+import React, { useState } from 'react';
+import { auth } from "../../firebaseConfig";
 import { signInWithEmailAndPassword } from 'firebase/auth';
 
 // Mapinha
@@ -84,7 +84,6 @@ export default function CadastroAlunoMaior({ irParaPainel, irParaVoltar }: Cadas
   };
 
   // function 1
-  
   const nextStep = async () => {
     // credenciais
     if (step === 1) {
@@ -200,8 +199,7 @@ export default function CadastroAlunoMaior({ irParaPainel, irParaVoltar }: Cadas
   const prevStep = () => setStep(step - 1);
 
   
-  // function 2 - fim
-  
+  // function 2
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setCarregandoFinal(true);

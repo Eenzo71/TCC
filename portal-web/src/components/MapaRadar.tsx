@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { db } from './firebaseConfig';
+import { db } from '../firebaseConfig';
 import { collection, onSnapshot } from 'firebase/firestore';
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
