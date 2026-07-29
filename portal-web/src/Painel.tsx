@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { auth } from './firebaseConfig';
 
-import PainelResponsavel from './PainelResponsavel';
-import PainelAlunoMaior from './PainelAlunoMaior';
+import PainelResponsavel from './pages/PainelResponsavel';
+import PainelAlunoMaior from './pages/PainelAlunoMaior';
 
 interface PainelProps {
   irParaLogin: () => void;

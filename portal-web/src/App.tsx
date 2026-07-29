@@ -1,133 +1,102 @@
 import React, { useState, useEffect } from 'react';
-import Login from './Login';
-import Cadastro from './Cadastro';
-import Painel from './Painel';
-import './style.css';
-import PanfletoDigital from './PanfletoDigital';
-import Radar from './TelaRadar';
-import CadastroAlunoMaior from './CadastroAlunoMaior';
-import AdicionarDependente from './AdicionarDependente';
-
 import { auth } from './firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 
-type Tela = 'login' | 'cadastro' | 'sucesso' | 'painel' | 'radar' | 'panfleto' | 'cadastro-maior';
+import Cadastro from './pages/cadastro/Cadastro';
+import CadastroAlunoMaior from './pages/cadastro/CadastroAlunoMaior';
+import PanfletoDigital from './pages/cadastro/PanfletoDigital';
+import Login from './pages/Login';
+import Layout from './components/Layout'; 
+import PainelResponsavel from './pages/PainelResponsavel';
+import PainelAlunoMaior from './pages/PainelAlunoMaior';
+import TelaRadar from './pages/TelaRadar';
+import './style.css';
+
+export type Tela = 'login' | 'cadastro' | 'sucesso' | 'painel' | 'radar' | 'panfleto' | 'cadastro-maior' | 'gerenciar-filhos';
+
+export interface UserProfile {
+  uid: string;
+  email: string;
+  tipo: 'responsavel' | 'aluno_maior' | 'dependente' | 'empresa';
+  nome: string;
+}
 
 export default function App() {
   const [telaAtual, setTelaAtual] = useState<Tela>('login');
-
   const [slugConvite, setSlugConvite] = useState<string | null>(null);
-  
   const [empresaVinculada, setEmpresaVinculada] = useState<string | null>(null);
-
-  const [usuarioLogado, setUsuarioLogado] = useState<boolean>(false);
   const [verificandoAuth, setVerificandoAuth] = useState<boolean>(true);
+  const [userData, setUserData] = useState<UserProfile | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        setUsuarioLogado(true);
+        try {
+          const resposta = await fetch(`http://localhost:3000/api/passageiros/perfil/${user.uid}`);
+          let tipoUsuario = 'dependente'; 
 
-        setTelaAtual((telaAnterior) => telaAnterior === 'login' ? 'painel' : telaAnterior);
+          if (resposta.ok) {
+            const dados = await resposta.json();
+            if (dados.valido) tipoUsuario = dados.tipo;
+          }
+
+          setUserData({ 
+            uid: user.uid, 
+            email: user.email!, 
+            tipo: tipoUsuario as any, 
+            nome: user.displayName || 'Usuário' 
+          });
+
+          setTelaAtual((telaAnterior) => telaAnterior === 'login' ? 'painel' : telaAnterior);
+        } catch (error) {
+          console.error('❌ Erro ao consultar o Back-end:', error);
+        }
       } else {
-        setUsuarioLogado(false);
-
-        setTelaAtual((telaAnterior) =>
-          (telaAnterior === 'painel' || telaAnterior === 'radar') ? 'login' : telaAnterior
-        );
+        setUserData(null);
+        setTelaAtual((telaAnterior) => (['painel', 'radar'].includes(telaAnterior) ? 'login' : telaAnterior));
       }
       setVerificandoAuth(false);
     });
-
     return () => unsubscribe();
   }, []);
 
-  // effect url convite
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const conviteNaUrl = params.get('convite');
-
-    if (conviteNaUrl) {
-      setSlugConvite(conviteNaUrl);
-      setTelaAtual('panfleto');
-    }
+    if (conviteNaUrl) { setSlugConvite(conviteNaUrl); setTelaAtual('panfleto'); }
   }, []);
 
-  // cronometro da Cutscene
   useEffect(() => {
     if (telaAtual === 'sucesso') {
-      const timer = setTimeout(() => {
-        setTelaAtual('painel');
-      }, 3000);
+      const timer = setTimeout(() => setTelaAtual('painel'), 3000);
       return () => clearTimeout(timer);
     }
   }, [telaAtual]);
 
-  if (verificandoAuth) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#e8effd' }}>
-        <h2 style={{ color: '#1a237e' }}>🛡️ Verificando sessão...</h2>
-      </div>
-    );
-  }
+  // ROTAS PÚBLICAS
+  if (verificandoAuth) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#e8effd' }}><h2 style={{ color: '#1a237e' }}>🛡️ Verificando sessão...</h2></div>;
+  if (telaAtual === 'login') return <Login irParaPanfleto={() => setTelaAtual('panfleto')} irParaPainel={() => setTelaAtual('painel')} />;
+  if (telaAtual === 'cadastro') return <Cadastro irParaLogin={() => setTelaAtual('login')} irParaSucesso={() => setTelaAtual('sucesso')} empresaId={empresaVinculada} />;
+  if (telaAtual === 'cadastro-maior') return <CadastroAlunoMaior irParaPainel={() => setTelaAtual('painel')} irParaVoltar={() => setTelaAtual('panfleto')} />;
+  if (telaAtual === 'panfleto') return <PanfletoDigital slugConvite={slugConvite || ''} irParaCadastroResponsavel={() => setTelaAtual('cadastro')} irParaCadastroAlunoMaior={() => setTelaAtual('cadastro-maior')} />;
+  if (telaAtual === 'sucesso') return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#111' }}><h1 style={{ color: '#fff' }}>🎉 Preparando o BusGap...</h1></div>;
 
-  if (telaAtual === 'login') {
-    return <Login irParaPanfleto={() => setTelaAtual('panfleto')} irParaPainel={() => setTelaAtual('painel')} />;
-  }
-
-  if (telaAtual === 'cadastro') {
-    return (
-      <Cadastro
-        irParaLogin={() => setTelaAtual('login')}
-        irParaSucesso={() => setTelaAtual('sucesso')}
-        empresaId={empresaVinculada}
-      />
-    );
-  }
-
-  if (telaAtual === 'cadastro-maior') {
-    return <CadastroAlunoMaior 
-      irParaPainel={() => setTelaAtual('painel')} 
-      irParaVoltar={() => setTelaAtual('panfleto')}
-    />;
-  }
-  if (telaAtual === 'sucesso') {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#111' }}>
-        <h1 style={{ color: '#fff', fontSize: '2rem' }}>🎉 Conta criada com sucesso! Preparando o BusGap...</h1>
-      </div>
-    );
-  }
-
-  if (telaAtual === 'painel') {
-    if (verificandoAuth) {
-      return (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f4f4f9' }}>
-          <h2 style={{ color: '#111' }}>🛡️ Verificando credenciais...</h2>
-        </div>
-      );
-    }
-    if (!usuarioLogado) {
+  // ROTAS PRIVADAS
+  if (['painel', 'radar', 'gerenciar-filhos'].includes(telaAtual)) {
+    if (!userData) {
       setTimeout(() => setTelaAtual('login'), 0);
       return null;
     }
-    return <Painel
-      irParaLogin={() => setTelaAtual('login')}
-      irParaRadar={() => setTelaAtual('radar')}
-    />;
-  }
 
-  if (telaAtual === 'radar') {
-    return <Radar irParaPainel={() => setTelaAtual('painel')} />;
-  }
-
-  if (telaAtual === 'panfleto') {
     return (
-      <PanfletoDigital
-        slugConvite={slugConvite || ''}
-        irParaCadastroResponsavel={() => setTelaAtual('cadastro')}
-        irParaCadastroAlunoMaior={() => setTelaAtual('cadastro-maior')}
-      />
+      <Layout userData={userData} telaAtual={telaAtual} setTelaAtual={setTelaAtual}>
+        {telaAtual === 'painel' && userData.tipo === 'responsavel' && <PainelResponsavel telaAtual={telaAtual} />}
+        {telaAtual === 'painel' && userData.tipo === 'aluno_maior' && <PainelAlunoMaior />}
+        {telaAtual === 'painel' && userData.tipo === 'dependente' && <TelaRadar />}
+        
+        {telaAtual === 'gerenciar-filhos' && userData.tipo === 'responsavel' && <PainelResponsavel telaAtual={telaAtual} />}
+        {telaAtual === 'radar' && <TelaRadar />}
+      </Layout>
     );
   }
 

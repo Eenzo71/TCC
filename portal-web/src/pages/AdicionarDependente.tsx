@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { auth } from './firebaseConfig';
+import { auth } from "../firebaseConfig";
+import '../dependente.css';
 
 interface AdicionarDependenteProps {
   empresaId: string;
@@ -109,53 +110,53 @@ export default function AdicionarDependente({ empresaId, onSucesso, onCancelar }
   const turmasDaEscolaSelecionada = escolasDisponiveis.find(e => e.nome === formData.instituicao)?.turmas || [];
 
   return (
-    <div style={styles.card}>
-      <h3 style={{ color: '#1a237e', marginTop: 0, marginBottom: '5px' }}>Adicionar Passageiro (Filho)</h3>
-      <p style={{ fontSize: '13px', color: '#666', marginBottom: '20px' }}>
+    <div className='card'>
+      <h3 className='tituloCard'>Adicionar Passageiro (Filho)</h3>
+      <p className='descricaoCard'>
         Cadastre os dados do estudante e crie as credenciais para ele acessar o App Mobile (QR Code).
       </p>
 
-      <form onSubmit={handleSalvar} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+      <form onSubmit={handleSalvar} className='form'>
         
         {/* dados basicos */}
-        <div style={styles.blocoGrupo}>
-          <h4 style={styles.tituloBloco}>👤 Dados Pessoais</h4>
-          <div style={styles.campo}>
-            <label style={styles.label}>Nome Completo:</label>
-            <input type="text" name="nome" value={formData.nome} onChange={handleChange} required style={styles.input} />
+        <div className='blocoGrupo'>
+          <h4 className='tituloBloco'>👤 Dados Pessoais</h4>
+          <div className='campo'>
+            <label className='label'>Nome Completo:</label>
+            <input type="text" name="nome" value={formData.nome} onChange={handleChange} required className='input' />
           </div>
-          <div style={styles.campo}>
-            <label style={styles.label}>Data de Nascimento:</label>
-            <input type="date" name="dataNascimento" value={formData.dataNascimento} onChange={handleChange} required style={styles.input} />
+          <div className='campo'>
+            <label className='label'>Data de Nascimento:</label>
+            <input type="date" name="dataNascimento" value={formData.dataNascimento} onChange={handleChange} required className='input' />
           </div>
         </div>
 
         {/* acesso ao app */}
-        <div style={styles.blocoGrupo}>
-          <h4 style={styles.tituloBloco}>📱 Acesso ao App Mobile</h4>
-          <p style={{fontSize: '12px', color: '#888', marginTop: 0, marginBottom: '10px'}}>
+        <div className='blocoGrupo'>
+          <h4 className='tituloBloco'>📱 Acesso ao App Mobile</h4>
+          <p className='descricaoBloco'>
             Crie um e-mail fictício (ex: enzo@busgap.com) ou use um real.
           </p>
-          <div style={styles.campo}>
-            <label style={styles.label}>E-mail de Acesso (App):</label>
-            <input type="email" name="email_app" value={formData.email_app} onChange={handleChange} required style={styles.input} placeholder="aluno@email.com" />
+          <div className='campo'>
+            <label className='label'>E-mail de Acesso (App):</label>
+            <input type="email" name="email_app" value={formData.email_app} onChange={handleChange} required className='input' placeholder="aluno@email.com" />
           </div>
-          <div style={styles.campo}>
-            <label style={styles.label}>Senha de Acesso (App):</label>
-            <input type="password" name="senha_app" value={formData.senha_app} onChange={handleChange} required style={styles.input} placeholder="Mínimo 6 caracteres" />
+          <div className='campo'>
+            <label className='label'>Senha de Acesso (App):</label>
+            <input type="password" name="senha_app" value={formData.senha_app} onChange={handleChange} required className='input' placeholder="Mínimo 6 caracteres" />
           </div>
         </div>
 
         {/* dados escolares */}
-        <div style={styles.blocoGrupo}>
-          <h4 style={styles.tituloBloco}>🏫 Escola e Turma</h4>
+        <div className='blocoGrupo'>
+          <h4 className='tituloBloco'>🏫 Escola e Turma</h4>
           {carregandoEscolas ? (
             <p style={{ fontSize: '13px', color: '#888' }}>Buscando escolas da frota...</p>
           ) : (
             <>
-              <div style={styles.campo}>
-                <label style={styles.label}>Instituição / Escola:</label>
-                <select name="instituicao" value={formData.instituicao} onChange={handleChange} required style={styles.input}>
+              <div className='campo'>
+                <label className='label'>Instituição / Escola:</label>
+                <select name="instituicao" value={formData.instituicao} onChange={handleChange} required className='input'>
                   <option value="">Selecione a escola...</option>
                   {escolasDisponiveis.map((e, i) => <option key={i} value={e.nome}>{e.nome}</option>)}
                 </select>
@@ -163,9 +164,9 @@ export default function AdicionarDependente({ empresaId, onSucesso, onCancelar }
 
               {formData.instituicao && (
                 <>
-                  <div style={styles.campo}>
-                    <label style={styles.label}>Turma / Ano:</label>
-                    <select name="turma" value={formData.turma} onChange={handleChange} required style={styles.input}>
+                  <div className='campo'>
+                    <label className='label'>Turma / Ano:</label>
+                    <select name="turma" value={formData.turma} onChange={handleChange} required className='input'>
                       <option value="">Selecione a turma...</option>
                       {turmasDaEscolaSelecionada.map((t, i) => <option key={i} value={t}>{t}</option>)}
                       <option value="outra">⚠️ Outra / Não encontrei</option>
@@ -173,15 +174,15 @@ export default function AdicionarDependente({ empresaId, onSucesso, onCancelar }
                   </div>
 
                   {formData.turma === 'outra' && (
-                    <div style={styles.campo}>
-                      <label style={{...styles.label, color: '#d32f2f'}}>Digite a turma manualmente:</label>
-                      <input type="text" name="turmaManual" value={formData.turmaManual} onChange={handleChange} required style={styles.input} placeholder="Ex: 5º Ano C" />
+                    <div className='campo'>
+                      <label className='label' style={{ color: '#d32f2f' }}>Digite a turma manualmente:</label>
+                      <input type="text" name="turmaManual" value={formData.turmaManual} onChange={handleChange} required className="input" placeholder="Ex: 5º Ano C" />
                     </div>
                   )}
 
-                  <div style={styles.campo}>
-                    <label style={styles.label}>Número de Matrícula (Opcional):</label>
-                    <input type="text" name="matricula" value={formData.matricula} onChange={handleChange} style={styles.input} placeholder="Matrícula escolar" />
+                  <div className='campo'>
+                    <label className='label'>Número de Matrícula (Opcional):</label>
+                    <input type="text" name="matricula" value={formData.matricula} onChange={handleChange} className="input" placeholder="Matrícula escolar" />
                   </div>
                 </>
               )}
@@ -189,9 +190,9 @@ export default function AdicionarDependente({ empresaId, onSucesso, onCancelar }
           )}
         </div>
 
-        <div style={styles.botoes}>
-          <button type="button" onClick={onCancelar} style={styles.btnVoltar} disabled={salvando}>Cancelar</button>
-          <button type="submit" style={styles.btnAvancar} disabled={salvando}>
+        <div className='botoes'>
+          <button type="button" onClick={onCancelar} className='btnVoltar' disabled={salvando}>Cancelar</button>
+          <button type="submit" className='btnAvancar' disabled={salvando}>
             {salvando ? 'Salvando...' : 'Adicionar Filho'}
           </button>
         </div>
@@ -200,14 +201,3 @@ export default function AdicionarDependente({ empresaId, onSucesso, onCancelar }
   );
 }
 
-const styles: { [key: string]: React.CSSProperties } = {
-  card: { backgroundColor: '#f9f9f9', padding: '25px', borderRadius: '12px', border: '1px solid #e0e0e0', width: '100%', boxSizing: 'border-box' },
-  blocoGrupo: { backgroundColor: '#fff', padding: '15px', borderRadius: '10px', border: '1px solid #eee' },
-  tituloBloco: { margin: '0 0 10px 0', fontSize: '14px', color: '#111' },
-  campo: { width: '100%', display: 'flex', flexDirection: 'column', gap: '5px', textAlign: 'left', marginBottom: '10px' },
-  label: { fontSize: '13px', color: '#333', fontWeight: 'bold' },
-  input: { width: '100%', height: '40px', borderRadius: '8px', border: '1px solid #ccc', padding: '0 10px', fontSize: '14px', boxSizing: 'border-box', outline: 'none' },
-  botoes: { display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' },
-  btnVoltar: { padding: '12px 20px', borderRadius: '8px', border: '1px solid #111', backgroundColor: '#fff', color: '#111', fontSize: '14px', cursor: 'pointer', fontWeight: 'bold' },
-  btnAvancar: { padding: '12px 20px', borderRadius: '8px', border: 'none', backgroundColor: '#4caf50', color: '#fff', fontSize: '14px', cursor: 'pointer', fontWeight: 'bold' }
-};
