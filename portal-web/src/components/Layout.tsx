@@ -3,6 +3,11 @@ import { signOut } from 'firebase/auth';
 import type { UserProfile, Tela } from '../App';
 import { auth } from '../firebaseConfig';
 import '../layout.css';
+import { GoHomeFill } from "react-icons/go";
+import { TbGps } from "react-icons/tb";
+import { MdPeople } from "react-icons/md";
+import { IoIosArrowBack } from "react-icons/io";
+import { IoTicket } from "react-icons/io5";
 
 interface LayoutProps {
   userData: UserProfile;
@@ -27,17 +32,13 @@ export default function Layout({
     <div className="layout">
 
       <aside className="sidebar">
-
+          <button className="BtnOpenCloes">
+             <IoIosArrowBack  size={20}/>
+          </button>
+    
         <div className="sidebarHeader">
+          <img className="img-logo" src="/images/Bbus.png" alt="Logo" />
           <h2 className="logo">BusGap</h2>
-
-          <p className="usuario">
-            Olá, {userData.nome}
-          </p>
-
-          <span className="tipoUsuario">
-            {userData.tipo.toUpperCase().replace('_', ' ')}
-          </span>
         </div>
 
         <nav className="nav">
@@ -47,23 +48,33 @@ export default function Layout({
               onClick={() => setTelaAtual('painel')}
               className="navStyle"
             >
-              🏠 Meu Painel
+              <GoHomeFill className="icons"/>Meu Painel
             </button>
           )}
+          
 
           <button
             onClick={() => setTelaAtual('radar')}
             className="navStyle"
           >
-            📍 Radar GPS
+            <TbGps className="icons" /> Radar GPS
           </button>
+
+           <button
+            onClick={() => setTelaAtual('radar')}
+            className="navStyle"
+          >
+            <IoTicket className="icons" /> Passagens
+          </button>
+
+          
 
           {userData.tipo === 'responsavel' && (
             <button
               onClick={() => setTelaAtual('gerenciar-filhos')}
               className="navStyle depender"
             >
-              👥 Meus Dependentes
+              <MdPeople className="icons" /> Meus Dependentes
             </button>
           )}
 

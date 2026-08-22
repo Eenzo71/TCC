@@ -3,7 +3,7 @@ import MapaRadar from '../components/MapaRadar';
 import { CiUser, CiBellOn } from "react-icons/ci";
 import { SlMagnifier } from "react-icons/sl";
 
-const colors = { bgNavbar: "#d6e2f9", primaryBlue: "#7b8ff7" };
+const colors = { bgNavbar: "#ffffff", primaryBlue: "#7b8ff7" };
 
 export default function PainelAlunoMaior() {
   return (
@@ -44,7 +44,7 @@ export default function PainelAlunoMaior() {
 const styles: { [key: string]: React.CSSProperties } = {
   conteudoGeral: { display: "flex", flexDirection: "column", height: "100%" },
   navbar: { height: "70px", backgroundColor: colors.bgNavbar, display: "flex", justifyContent: "flex-end", alignItems: "center", padding: "0 30px", borderRadius: "12px", marginBottom: "20px" },
-  perfil: { background: "linear-gradient(90deg, #7b8ff7, #a5b4fc)", padding: "8px 15px", borderRadius: "25px", color: "white", display: "flex", alignItems: "center", gap: "10px" },
+  perfil: { background: "linear-gradient(90deg, #7b8ff7, #ffffff)", padding: "8px 15px", borderRadius: "25px", color: "white", display: "flex", alignItems: "center", gap: "10px" },
   bannerContainer: { height: "180px", marginBottom: "20px" },
   bannerImg: { backgroundImage: "url('/images/imagemdoponto.png')", backgroundPosition: "center", backgroundSize: "cover", borderRadius: "12px", height: "100%" },
   gridSistema: { display: "flex", gap: "20px", flex: 1 },

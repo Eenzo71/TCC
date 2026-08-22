@@ -243,13 +243,13 @@ export default function Cadastro({ irParaLogin, irParaSucesso, empresaId }: Cada
     }
   };
 
-  return (
+return (
     <div style={styles.telaInteira}>
 
-      {/* Caixinha azul com o estilo herdado do login */}
-      <div className="log" style={{ width: '450px', padding: '40px' }}>
+      {/* Caixa de Cadastro com classe isolada para evitar conflito de grid */}
+      <div className="card-cadastro">
 
-        <h3 id="login" style={{ textAlign: 'left', margin: 0, fontSize: '24px' }}>Crie a sua conta</h3>
+        <h3 id="login">Crie a sua conta</h3>
         <hr className="linha-titulo" />
 
         <form onSubmit={step === 4 ? handleSubmit : (e) => { e.preventDefault(); nextStep(); }}>
@@ -275,7 +275,7 @@ export default function Cadastro({ irParaLogin, irParaSucesso, empresaId }: Cada
                 <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} required style={styles.input} />
 
                 {formData.confirmPassword.length > 0 && formData.password !== formData.confirmPassword && (
-                  <span style={{ color: '#d32f2f', fontSize: '12px', marginTop: '-10px', marginBottom: '5px' }}>
+                  <span style={{ color: '#d32f2f', fontSize: '12px', marginTop: '-5px', marginBottom: '5px' }}>
                     * as senhas precisam ser iguais
                   </span>
                 )}
@@ -322,7 +322,7 @@ export default function Cadastro({ irParaLogin, irParaSucesso, empresaId }: Cada
               </div>
 
               <div style={styles.linha}>
-                <div style={{ ...styles.campo, flex: 1, marginRight: '10px' }}>
+                <div style={{ ...styles.campo, flex: 1 }}>
                   <label style={styles.label}>UF:</label>
                   <input type="text" name="estado" value={formData.estado} onChange={handleChange} required style={styles.input} />
                 </div>
@@ -336,8 +336,9 @@ export default function Cadastro({ irParaLogin, irParaSucesso, empresaId }: Cada
                 <label style={styles.label}>Bairro:</label>
                 <input type="text" name="bairro" value={formData.bairro} onChange={handleChange} required style={styles.input} />
               </div>
+              
               <div style={styles.linha}>
-                <div style={{ ...styles.campo, flex: 3, marginRight: '10px' }}>
+                <div style={{ ...styles.campo, flex: 3 }}>
                   <label style={styles.label}>Rua:</label>
                   <input type="text" name="rua" value={formData.rua} onChange={handleChange} required style={styles.input} />
                 </div>
@@ -346,27 +347,28 @@ export default function Cadastro({ irParaLogin, irParaSucesso, empresaId }: Cada
                   <input type="text" name="numero" value={formData.numero} onChange={handleChange} required style={styles.input} />
                 </div>
               </div>
+
               <div style={styles.campo}>
                 <label style={styles.label}>Complemento (Opcional):</label>
                 <input type="text" name="complemento" value={formData.complemento} onChange={handleChange} style={styles.input} />
               </div>
+
               <div style={styles.botoes}>
                 <button type="button" onClick={prevStep} style={styles.btnVoltar}>Voltar</button>
                 <button type="button" onClick={nextStep} style={styles.btnAvancar}>Próximo</button>
               </div>
             </>
           )}
-          {/* ETAPA 4: mapinha*/}
+
+          {/* ETAPA 4: MAPINHA */}
           {step === 4 && (
             <>
-              <h3>
-                Ajuste Manual
-              </h3>
-              <p>
+              <h3 style={{ fontSize: '18px', marginBottom: '8px', textAlign: 'left' }}>Ajuste Manual</h3>
+              <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '15px', textAlign: 'left' }}>
                 Segure e arraste o pino azul para o local exato da sua residência.
               </p>
 
-              <div style={{ height: '300px', width: '100%', marginBottom: '20px', borderRadius: '10px', overflow: 'hidden' }}>
+              <div style={{ height: '260px', width: '100%', marginBottom: '20px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #cbd5e1' }}>
                 {formData.lat && (
                   <MapContainer center={[parseFloat(formData.lat), parseFloat(formData.lng)]} zoom={16} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -378,27 +380,22 @@ export default function Cadastro({ irParaLogin, irParaSucesso, empresaId }: Cada
               <div style={styles.botoes}>
                 <button type="button" onClick={prevStep} style={styles.btnVoltar}>Voltar</button>
                 <button type="submit" disabled={carregandoFinal} style={styles.btnAvancar}>
-                  {carregandoFinal ? 'Processando Segurança...' : 'Finalizar Cadastro'}
+                  {carregandoFinal ? 'Processando...' : 'Finalizar'}
                 </button>
               </div>
             </>
           )}
         </form>
       </div>
-      {/* popup email cadastrado*/}
+
+      {/* POPUP E-MAIL CADASTRADO */}
       {showPopupEmail && (
         <div style={styles.overlay}>
           <div style={styles.popup}>
             <h2>E-mail já cadastrado</h2>
-            <p>
-              Parece que este e-mail já possui uma conta no BusGap. O que deseja fazer?
-            </p>
-            <button onClick={irParaLoginComEmail} style={styles.btnPopupLogin}>
-              Fazer login / Entrar na conta
-            </button>
-            <button onClick={() => setShowPopupEmail(false)} style={styles.btnPopupCancelar}>
-              Cancelar
-            </button>
+            <p>Parece que este e-mail já possui uma conta no BusGap. O que deseja fazer?</p>
+            <button onClick={irParaLoginComEmail} style={styles.btnPopupLogin}>Fazer login / Entrar</button>
+            <button onClick={() => setShowPopupEmail(false)} style={styles.btnPopupCancelar}>Cancelar</button>
           </div>
         </div>
       )}
@@ -428,15 +425,14 @@ function MarcadorArrastavel({ lat, lng, setFormData }: any) {
 }
 
 const styles: { [key: string]: React.CSSProperties } = {
-  telaInteira: { display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', width: '100%' },
-  porcentagem: { width: '100%', height: '8px', borderRadius: '10px', marginBottom: '25px', backgroundColor: '#fff', position: 'relative' },
-  progress: { height: '100%', backgroundColor: '#528ee7ff', borderRadius: '10px', transition: 'width 0.3s' },
-  campo: { width: '100%', display: 'flex', flexDirection: 'column', gap: '5px', textAlign: 'left' },
-  linha: { display: 'flex', width: '100%', justifyContent: 'space-between' },
-  label: { fontSize: '14px', color: '#222', fontWeight: 'bold' },
-  input: { width: '100%', height: '45px', borderRadius: '10px', border: 'none', padding: '0 15px', fontSize: '14px', boxSizing: 'border-box', marginBottom: '15px', outline: 'none' },
-  botoes: { display: 'flex', justifyContent: 'space-between', width: '100%', marginTop: '10px' },
-  btnVoltar: { width: '48%', height: '45px', borderRadius: '10px', border: 'none', backgroundColor: '#fff', color: '#111', fontSize: '14px', cursor: 'pointer', fontWeight: 'bold' },
-  btnAvancar: { width: '48%', height: '45px', borderRadius: '10px', border: 'none', backgroundColor: '#111', color: '#fff', fontSize: '14px', cursor: 'pointer', fontWeight: 'bold' }
-
+  telaInteira: { display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', width: '100%', backgroundColor: '#d1e3ff' },
+  porcentagem: { width: '100%', height: '6px', borderRadius: '4px', marginBottom: '20px', backgroundColor: '#e2e8f0', position: 'relative', overflow: 'hidden' },
+  progress: { height: '100%', backgroundColor: '#4f46e5', borderRadius: '4px', transition: 'width 0.3s ease' },
+  campo: { width: '100%', display: 'flex', flexDirection: 'column', gap: '6px', textAlign: 'left',marginBottom: '15px'},
+  linha: { display: 'flex', width: '100%', gap: '10px' },
+  label: { fontSize: '14px', color: '#334155', fontWeight: '600' },
+  input: { width: '100%', height: '42px', borderRadius: '8px', border: '1px solid #cbd5e1', padding: '0 12px', fontSize: '14px', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b', outline: 'none' },
+  botoes: { display: 'flex', justifyContent: 'space-between', width: '100%', marginTop: '20px',    gap: '12px'},
+  btnVoltar: { flex: 1, height: '42px', borderRadius: '8px', border: '1px solid #cbd5e1', backgroundColor: '#fff', color: '#374151', fontSize: '14px', cursor: 'pointer', fontWeight: '600' },
+  btnAvancar: { flex: 1, height: '42px', borderRadius: '8px', border: 'none', backgroundColor: '#4f46e5', color: '#fff', fontSize: '14px', cursor: 'pointer', fontWeight: '600' }
 };

@@ -31,7 +31,7 @@ export default function Login({ irParaPanfleto, irParaPainel }: LoginProps) {
   return (
     <div className="container">
       <div className="top-bar">
-        <h1>BusGap</h1>
+        <img src="/images/bus_gap_sem_fundo.png" alt="BusGap Logo" />
       </div>
       <div className="main-content">
         <div className="log">  

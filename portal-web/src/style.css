@@ -18,14 +18,16 @@ body{
 
 .top-bar{
     background: linear-gradient(to right, #ffffff, #ffffff);
-    padding: 15px 0;
+    padding: 0px 0px 0px 0px;
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1); 
     font-family: 'Unbounded', sans-serif;
+    height: 110px;
 }
 
-.top-bar h1{
-    margin: 0 0 0 40px;
-    font-size: 28px;
+.top-bar img{
+    margin: 0px 0px 4px 10px;
+    width: 120px;
+    height: 120px;
 }
 
 .main-content {
@@ -94,9 +96,9 @@ background: #ffffff8d;
     width: 100%;
     padding: 14px;
     margin-bottom: 20px;
-    border: none;
+    border: 1px solid black;
     border-radius: 10px;
-    outline: none;
+    background-color: #d1e3ff;
 }
 
 .btn-container {
@@ -145,4 +147,32 @@ background: #ffffff8d;
 
 .links-rodape .divisor {
     color: white;
+}
+
+
+.card-cadastro {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+    width: 480px;
+    padding: 40px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-cadastro h3 {
+    margin: 0;
+    font-size: 24px;
+    font-family: 'Unbounded', sans-serif;
+    color: #1e293b;
+    text-align: left;
+}
+
+.card-cadastro .linha-titulo {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 12px 0 24px 0;
+    width: 100%;
 }

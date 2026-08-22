@@ -1,46 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@200..900&display=swap');
+
 .layout {
     display: flex;
     height: 100vh;
     width: 100vw;
     background-color: aliceblue;
-    background-image: radial-gradient(circle, #ffffff, #c8eaff);
+    background-image: radial-gradient(circle, #EDF4F9, #d1e7ff);
     overflow: hidden;
 }
 
 .sidebar {
     width: 250px;
     background-color: #c3deff;
-    background-image: linear-gradient(to bottom, #d2deff, #f2f5ff);
-    color: rgb(0, 3, 100);
+    background-image: linear-gradient(to bottom, #0052A3, #004181);
+    color: rgb(255, 255, 255);
     display: flex;
     flex-direction: column;
-    border: 1px solid rgb(255, 255, 255);            
-}
+    border: 1px solid rgb(255, 255, 255); 
+    position: relative;           
+} 
 
 .sidebarHeader {
-    padding: 20px;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.215);
+    padding: 10px 20px 20px 5px;
+}
+
+.img-logo{
+    width: 70px;            
+    height: 70px;           
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: -15px;
 }
 
 .logo {
-    margin: 0 0 5px 0;
-}
-
-.usuario {
-    margin: 0;
-    font-size: 14px;
-    color: #000000;
-}
-
-.tipoUsuario {
     display: inline-block;
-    margin-top: 8px;
-    font-size: 11px;
-    background-color: #4caf50;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-weight: bold;
-    color:  white;
+    vertical-align: middle;
+    margin: 0;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 24px;
+}
+
+.icons{
+    width: 20px;
+    height: 20px;
 }
 
 .nav {
@@ -51,21 +53,48 @@
 }
 
 .navStyle {
+    display: flex;             
+    align-items: center;        
+    gap: 10px;                 
     text-align: left;
-    padding: 12px 15px;
+    padding: 12px 20px;
     background-color: transparent;
-    color: rgb(0, 8, 95);
+    color: rgb(255, 255, 255);
     border: none;
     cursor: pointer;
-    font-size: 15px;
-    font-weight: normal;
-    transition: all .5s;
 }
 
 .navStyle:hover {
-    background-color: rgb(81, 78, 255);
+    margin: 0px 5px 0px 5px;
+    background-color: #003B75;
     color: white;
     transition: all .3s;
+    border-radius: 10px;
+}
+
+.BtnOpenCloes {
+    position: absolute;
+    top: 50%;
+    right: -15px; 
+    transform: translateY(-50%); 
+    width: 30px;
+    height: 60px;
+    border-radius: 5px;
+    background-color: #ffffff; 
+    color: #003B75;
+    border: 1px solid #003B75;   
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10; 
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3); 
+    transition: all 0.3s ease;
+}
+
+.BtnOpenCloes:hover {
+  background-color: #003B75;
+  color: #ffffff;
 }
 
 .logoutContainer {
@@ -75,18 +104,20 @@
 .btnLogout {
     width: 100%;
     padding: 12px;
-    background-color: #0033ff;
-    color: white;
+    background-color: #ffffff;
+    color: #003B75;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
     transition: .5s;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .btnLogout:hover {
-    background-color: #000276;
+    background-color: #003B75;
     transition: .3s;
+    color:#ffffff
 }
 
 .mainContent {

@@ -83,7 +83,6 @@ export default function CadastroAlunoMaior({ irParaPainel, irParaVoltar }: Cadas
     }
   };
 
-  // function 1
   const nextStep = async () => {
     // credenciais
     if (step === 1) {
@@ -143,7 +142,7 @@ export default function CadastroAlunoMaior({ irParaPainel, irParaVoltar }: Cadas
 
       const tentativasBusca = [
         `${formData.rua}, ${formData.numero}, ${formData.cidade}, ${formData.estado}, Brasil`,
-        `${formData.rua}, ${formData.cidade}, ${formData.estado}, Brasil`,             
+        `${formData.rua}, ${formData.cidade}, ${formData.estado}, Brasil`,            
         `${formData.cidade}, ${formData.estado}, Brasil`,
         `${formData.estado}, Brasil`
       ];
@@ -153,16 +152,13 @@ export default function CadastroAlunoMaior({ irParaPainel, irParaVoltar }: Cadas
       for (const busca of tentativasBusca) {
         try {
           const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(busca)}`);
-          
-          if (!response.ok) continue; // se o osm deu pau, tenta a próxima busca
-          
+          if (!response.ok) continue; 
           const data = await response.json();
 
           if (data && data.length > 0) {
             setFormData(prev => ({ ...prev, lat: data[0].lat, lng: data[0].lon }));
             coordenadasEncontradas = true;
             
-            // se ele não achou a tentativa 0 
             if (busca !== tentativasBusca[0]) {
               alert(`O satélite não encontrou o número exato, mas centralizamos na região: ${busca}. Arraste o pino para a sua casa!`);
             }
@@ -198,8 +194,6 @@ export default function CadastroAlunoMaior({ irParaPainel, irParaVoltar }: Cadas
 
   const prevStep = () => setStep(step - 1);
 
-  
-  // function 2
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setCarregandoFinal(true);
@@ -257,13 +251,16 @@ export default function CadastroAlunoMaior({ irParaPainel, irParaVoltar }: Cadas
 
   return (
     <div style={styles.telaInteira}>
-      <div className="log" style={{ width: '500px', padding: '40px', backgroundColor: '#fff', borderRadius: '15px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}>
+      
+      {/* Caixa de Cadastro ajustada com card-cadastro para evitar conflitos de grid */}
+      <div className="card-cadastro">
 
-        <h3 style={{ textAlign: 'left', margin: 0, fontSize: '24px', color: '#1a237e' }}>Perfil do Aluno (+18)</h3>
-        <hr style={{ border: '1px solid #eee', marginBottom: '20px' }} />
+        <h3 style={{ textAlign: 'left', margin: 0, fontSize: '24px', color: '#1e293b' }}>Perfil do Aluno (+18)</h3>
+        <hr className="linha-titulo" />
 
         <form onSubmit={step === 5 ? handleSubmit : (e) => { e.preventDefault(); nextStep(); }}>
 
+          {/* Barra de Progresso */}
           <div style={styles.porcentagem}>
             <div style={{ ...styles.progress, width: `${step * 20}%` }}></div>
           </div>
@@ -273,7 +270,15 @@ export default function CadastroAlunoMaior({ irParaPainel, irParaVoltar }: Cadas
             <>
               <div style={styles.campo}><label style={styles.label}>E-mail:</label><input type="email" name="email" value={formData.email} onChange={handleChange} required style={styles.input} /></div>
               <div style={styles.campo}><label style={styles.label}>Senha:</label><input type="password" name="password" value={formData.password} onChange={handleChange} required style={styles.input} /></div>
-              <div style={styles.campo}><label style={styles.label}>Confirmar Senha:</label><input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} required style={styles.input} /></div>
+              <div style={styles.campo}>
+                <label style={styles.label}>Confirmar Senha:</label>
+                <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} required style={styles.input} />
+                {formData.confirmPassword.length > 0 && formData.password !== formData.confirmPassword && (
+                  <span style={{ color: '#d32f2f', fontSize: '12px', marginTop: '-2px', marginBottom: '5px' }}>
+                    * as senhas precisam ser iguais
+                  </span>
+                )}
+              </div>
               <div style={styles.botoes}>
                 <button type="button" onClick={irParaVoltar} style={styles.btnVoltar}>Cancelar</button>
                 <button type="button" onClick={nextStep} style={styles.btnAvancar}>Próximo</button>
@@ -285,7 +290,7 @@ export default function CadastroAlunoMaior({ irParaPainel, irParaVoltar }: Cadas
           {step === 2 && (
             <>
               <div style={styles.campo}><label style={styles.label}>Nome Completo:</label><input type="text" name="nome" value={formData.nome} onChange={handleChange} required style={styles.input} /></div>
-              <div style={{ display: 'flex', gap: '10px' }}>
+              <div style={styles.linha}>
                 <div style={styles.campo}><label style={styles.label}>CPF:</label><input type="text" name="cpf" value={formData.cpf} onChange={handleChange} required style={styles.input} /></div>
                 <div style={styles.campo}><label style={styles.label}>Nascimento:</label><input type="date" name="dataNascimento" value={formData.dataNascimento} onChange={handleChange} required style={styles.input} /></div>
               </div>
@@ -302,12 +307,12 @@ export default function CadastroAlunoMaior({ irParaPainel, irParaVoltar }: Cadas
           {step === 3 && (
             <>
               <div style={styles.campo}><label style={styles.label}>CEP:</label><input type="text" name="cep" value={formData.cep} onChange={handleChange} maxLength={9} required style={styles.input} /></div>
-              <div style={{ display: 'flex', gap: '10px' }}>
+              <div style={styles.linha}>
                 <div style={{ ...styles.campo, flex: 3 }}><label style={styles.label}>Cidade:</label><input type="text" name="cidade" value={formData.cidade} onChange={handleChange} required style={styles.input} /></div>
                 <div style={{ ...styles.campo, flex: 1 }}><label style={styles.label}>UF:</label><input type="text" name="estado" value={formData.estado} onChange={handleChange} required style={styles.input} /></div>
               </div>
               <div style={styles.campo}><label style={styles.label}>Bairro:</label><input type="text" name="bairro" value={formData.bairro} onChange={handleChange} required style={styles.input} /></div>
-              <div style={{ display: 'flex', gap: '10px' }}>
+              <div style={styles.linha}>
                 <div style={{ ...styles.campo, flex: 3 }}><label style={styles.label}>Rua:</label><input type="text" name="rua" value={formData.rua} onChange={handleChange} required style={styles.input} /></div>
                 <div style={{ ...styles.campo, flex: 1 }}><label style={styles.label}>Nº:</label><input type="text" name="numero" value={formData.numero} onChange={handleChange} required style={styles.input} /></div>
               </div>
@@ -322,10 +327,10 @@ export default function CadastroAlunoMaior({ irParaPainel, irParaVoltar }: Cadas
           {/* map */}
           {step === 4 && (
             <>
-              <h4 style={{ margin: '0 0 10px 0', color: '#333' }}>Confirme o local de embarque</h4>
-              <p style={{ fontSize: '13px', color: '#666', marginBottom: '15px' }}>Nosso algoritmo usará este ponto para traçar a rota. Arraste o pino para a sua casa.</p>
+              <h4 style={{ margin: '0 0 8px 0', color: '#1e293b', fontSize: '18px', textAlign: 'left' }}>Confirme o local de embarque</h4>
+              <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '15px', textAlign: 'left' }}>Nosso algoritmo usará este ponto para traçar a rota. Arraste o pino para a sua casa.</p>
 
-              <div style={{ height: '250px', width: '100%', marginBottom: '20px', borderRadius: '10px', overflow: 'hidden' }}>
+              <div style={{ height: '260px', width: '100%', marginBottom: '20px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #cbd5e1' }}>
                 {formData.lat && (
                   <MapContainer center={[parseFloat(formData.lat), parseFloat(formData.lng)]} zoom={16} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -341,11 +346,11 @@ export default function CadastroAlunoMaior({ irParaPainel, irParaVoltar }: Cadas
             </>
           )}
 
-          {/* scholas e trumas */}
+          {/* escolas e turmas */}
           {step === 5 && (
             <>
               {carregandoEscolas ? (
-                <p style={{ textAlign: 'center', color: '#666' }}>Buscando frotas e escolas em {formData.cidade}...</p>
+                <p style={{ textAlign: 'center', color: '#64748b', padding: '20px 0' }}>Buscando frotas e escolas em {formData.cidade}...</p>
               ) : (
                 <>
                   <div style={styles.campo}>
@@ -383,7 +388,7 @@ export default function CadastroAlunoMaior({ irParaPainel, irParaVoltar }: Cadas
                   )}
 
                   {formData.instituicao === 'nao_listada' && (
-                    <div style={{ padding: '15px', backgroundColor: '#fff3cd', borderRadius: '8px', border: '1px dashed #ffb300', marginBottom: '15px' }}>
+                    <div style={{ padding: '15px', backgroundColor: '#fff3cd', borderRadius: '8px', border: '1px dashed #ffb300', marginBottom: '15px', textAlign: 'left' }}>
                       <p style={{ margin: 0, fontSize: '13px', color: '#555' }}>
                         Sem problemas! Você poderá criar sua conta e, posteriormente, vincular-se a uma frota usando um código de convite no painel.
                       </p>
@@ -421,13 +426,14 @@ function MarcadorArrastavel({ lat, lng, setFormData }: any) {
 }
 
 const styles: { [key: string]: React.CSSProperties } = {
-  telaInteira: { display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: '#e8effd', width: '100%' },
-  porcentagem: { width: '100%', height: '8px', borderRadius: '10px', marginBottom: '25px', backgroundColor: '#eee', position: 'relative' },
-  progress: { height: '100%', backgroundColor: '#1a237e', borderRadius: '10px', transition: 'width 0.3s' },
-  campo: { width: '100%', display: 'flex', flexDirection: 'column', gap: '5px', textAlign: 'left', marginBottom: '10px' },
-  label: { fontSize: '14px', color: '#333', fontWeight: 'bold' },
-  input: { width: '100%', height: '40px', borderRadius: '8px', border: '1px solid #ccc', padding: '0 10px', fontSize: '14px', boxSizing: 'border-box', outline: 'none' },
-  botoes: { display: 'flex', justifyContent: 'space-between', width: '100%', marginTop: '15px' },
-  btnVoltar: { width: '48%', height: '45px', borderRadius: '8px', border: '1px solid #111', backgroundColor: '#fff', color: '#111', fontSize: '14px', cursor: 'pointer', fontWeight: 'bold' },
-  btnAvancar: { width: '48%', height: '45px', borderRadius: '8px', border: 'none', backgroundColor: '#111', color: '#fff', fontSize: '14px', cursor: 'pointer', fontWeight: 'bold' }
+  telaInteira: { display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', width: '100%' },
+  porcentagem: { width: '100%', height: '6px', borderRadius: '4px', marginBottom: '20px', backgroundColor: '#e2e8f0', position: 'relative', overflow: 'hidden' },
+  progress: { height: '100%', backgroundColor: '#4f46e5', borderRadius: '4px', transition: 'width 0.3s ease' },
+  campo: { width: '100%', display: 'flex', flexDirection: 'column', gap: '6px', textAlign: 'left', marginBottom: '15px' },
+  linha: { display: 'flex', width: '100%', gap: '10px' },
+  label: { fontSize: '14px', color: '#334155', fontWeight: '600' },
+  input: { width: '100%', height: '42px', borderRadius: '8px', border: '1px solid #cbd5e1', padding: '0 12px', fontSize: '14px', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b', outline: 'none' },
+  botoes: { display: 'flex', justifyContent: 'space-between', width: '100%', marginTop: '20px', gap: '12px' },
+  btnVoltar: { flex: 1, height: '42px', borderRadius: '8px', border: '1px solid #cbd5e1', backgroundColor: '#fff', color: '#374151', fontSize: '14px', cursor: 'pointer', fontWeight: '600' },
+  btnAvancar: { flex: 1, height: '42px', borderRadius: '8px', border: 'none', backgroundColor: '#4f46e5', color: '#fff', fontSize: '14px', cursor: 'pointer', fontWeight: '600' }
 };
