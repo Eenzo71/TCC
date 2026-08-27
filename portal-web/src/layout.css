@@ -17,19 +17,29 @@
     display: flex;
     flex-direction: column;
     border: 1px solid rgb(255, 255, 255); 
-    position: relative;           
-} 
+    position: relative;
+    transition: width 0.3s ease;
+    flex-shrink: 0;
+}
+
+.sidebar.collapsed {
+    width: 80px;
+}
 
 .sidebarHeader {
     padding: 10px 20px 20px 5px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
 }
 
-.img-logo{
-    width: 70px;            
-    height: 70px;           
+.img-logo {
+    width: 70px;
+    height: 70px;
     display: inline-block;
     vertical-align: middle;
     margin-right: -15px;
+    flex-shrink: 0;
 }
 
 .logo {
@@ -38,11 +48,19 @@
     margin: 0;
     font-family: 'Unbounded', sans-serif;
     font-size: 24px;
+    white-space: nowrap;
+    transition: opacity 0.2s ease;
 }
 
-.icons{
+.sidebar.collapsed .logo {
+    display: none;
+}
+
+.icons {
+    min-width: 20px;
     width: 20px;
     height: 20px;
+    flex-shrink: 0;
 }
 
 .nav {
@@ -53,15 +71,16 @@
 }
 
 .navStyle {
-    display: flex;             
-    align-items: center;        
-    gap: 10px;                 
+    display: flex;
+    align-items: center;
+    gap: 10px;
     text-align: left;
     padding: 12px 20px;
     background-color: transparent;
     color: rgb(255, 255, 255);
     border: none;
     cursor: pointer;
+    white-space: nowrap;
 }
 
 .navStyle:hover {
@@ -70,6 +89,19 @@
     color: white;
     transition: all .3s;
     border-radius: 10px;
+}
+
+.sidebar.collapsed .navStyle {
+    justify-content: center;
+    padding: 12px 0;
+}
+
+.sidebar.collapsed .navStyle:hover {
+    margin: 0;
+}
+
+.sidebar.collapsed .navText {
+    display: none;
 }
 
 .BtnOpenCloes {
@@ -93,8 +125,16 @@
 }
 
 .BtnOpenCloes:hover {
-  background-color: #003B75;
-  color: #ffffff;
+    background-color: #003B75;
+    color: #ffffff;
+}
+
+.arrowIcon {
+    transition: transform 0.3s ease;
+}
+
+.sidebar.collapsed .arrowIcon {
+    transform: rotate(180deg);
 }
 
 .logoutContainer {
@@ -112,17 +152,36 @@
     font-weight: bold;
     transition: .5s;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
 
 .btnLogout:hover {
     background-color: #003B75;
     transition: .3s;
-    color:#ffffff
+    color:#ffffff;
+}
+
+.logoutIcon {
+    display: none;
+}
+
+.sidebar.collapsed .logoutIcon {
+    display: block;
+}
+
+.contentWrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .mainContent {
     flex: 1;
-    padding: 5px;
+    padding: 0;
     overflow-y: auto;
 }
-

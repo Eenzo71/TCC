@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { signOut } from 'firebase/auth';
 import type { UserProfile, Tela } from '../App';
 import { auth } from '../firebaseConfig';
 import '../layout.css';
 import { GoHomeFill } from "react-icons/go";
 import { TbGps } from "react-icons/tb";
-import { MdPeople } from "react-icons/md";
+import { MdPeople, MdLogout } from "react-icons/md";
 import { IoIosArrowBack } from "react-icons/io";
 import { IoTicket } from "react-icons/io5";
 
@@ -22,19 +22,23 @@ export default function Layout({
   setTelaAtual,
   children
 }: LayoutProps) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleLogout = async () => {
     await signOut(auth);
     setTelaAtual('login');
   };
 
+  const toggleSidebar = () => {
+    setIsCollapsed(prev => !prev);
+  };
+
   return (
     <div className="layout">
-
-      <aside className="sidebar">
-          <button className="BtnOpenCloes">
-             <IoIosArrowBack  size={20}/>
-          </button>
+      <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+        <button className="BtnOpenCloes" onClick={toggleSidebar}>
+          <IoIosArrowBack size={20} className="arrowIcon" />
+        </button>
     
         <div className="sidebarHeader">
           <img className="img-logo" src="/images/Bbus.png" alt="Logo" />
@@ -42,42 +46,41 @@ export default function Layout({
         </div>
 
         <nav className="nav">
-
           {userData.tipo !== 'dependente' && (
             <button
               onClick={() => setTelaAtual('painel')}
               className="navStyle"
             >
-              <GoHomeFill className="icons"/>Meu Painel
+              <GoHomeFill className="icons" />
+              <span className="navText">Meu Painel</span>
             </button>
           )}
-          
 
           <button
             onClick={() => setTelaAtual('radar')}
             className="navStyle"
           >
-            <TbGps className="icons" /> Radar GPS
+            <TbGps className="icons" />
+            <span className="navText">Radar GPS</span>
           </button>
 
-           <button
+          <button
             onClick={() => setTelaAtual('radar')}
             className="navStyle"
           >
-            <IoTicket className="icons" /> Passagens
+            <IoTicket className="icons" />
+            <span className="navText">Passagens</span>
           </button>
-
-          
 
           {userData.tipo === 'responsavel' && (
             <button
               onClick={() => setTelaAtual('gerenciar-filhos')}
               className="navStyle depender"
             >
-              <MdPeople className="icons" /> Meus Dependentes
+              <MdPeople className="icons" />
+              <span className="navText">Meus Dependentes</span>
             </button>
           )}
-
         </nav>
 
         <div className="logoutContainer">
@@ -85,16 +88,17 @@ export default function Layout({
             onClick={handleLogout}
             className="btnLogout"
           >
-            Sair do Sistema
+            <MdLogout className="icons logoutIcon" />
+            <span className="navText">Sair do Sistema</span>
           </button>
         </div>
-
       </aside>
 
-      <main className="mainContent">
-        {children}
-      </main>
-
+      <div className="contentWrapper">
+        <main className="mainContent">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
