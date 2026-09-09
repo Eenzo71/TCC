@@ -12,9 +12,22 @@ import PainelAlunoMaior from './pages/PainelAlunoMaior';
 import TelaRadar from './pages/TelaRadar';
 import Empresa from './pages/Empresa';
 import Passagens from './pages/Passagens';
+import PerfilPages from './pages/PerfilPages';
 import './style.css';
 
-export type Tela = 'login' | 'cadastro' | 'sucesso' | 'painel' | 'radar' | 'panfleto' | 'cadastro-maior' | 'gerenciar-filhos' | 'Passagens' | 'Empresa';
+// Definição e exportação de tipos para compartilhamento na aplicação
+export type Tela = 
+  | 'login' 
+  | 'cadastro' 
+  | 'sucesso' 
+  | 'painel' 
+  | 'radar' 
+  | 'panfleto' 
+  | 'cadastro-maior' 
+  | 'gerenciar-filhos' 
+  | 'Passagens' 
+  | 'Empresa' 
+  | 'perfil';
 
 export interface UserProfile {
   uid: string;
@@ -49,13 +62,13 @@ export default function App() {
             nome: user.displayName || 'Usuário' 
           });
 
-          setTelaAtual((telaAnterior) => telaAnterior === 'login' ? 'painel' : telaAnterior);
+          setTelaAtual((telaAnterior: Tela) => telaAnterior === 'login' ? 'painel' : telaAnterior);
         } catch (error) {
           console.error('❌ Erro ao consultar o Back-end:', error);
         }
       } else {
         setUserData(null);
-        setTelaAtual((telaAnterior) => (['painel', 'radar', 'gerenciar-filhos', 'Passagens', 'Empresa'].includes(telaAnterior) ? 'login' : telaAnterior));
+        setTelaAtual((telaAnterior: Tela) => (['painel', 'radar', 'gerenciar-filhos', 'Passagens', 'Empresa', 'perfil'].includes(telaAnterior) ? 'login' : telaAnterior));
       }
       setVerificandoAuth(false);
     });
@@ -64,10 +77,21 @@ export default function App() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    const telaNaUrl = params.get('tela') as Tela | null;
+
+    if (telaNaUrl === 'perfil') {
+      setTelaAtual('perfil');
+    }
+
     const conviteNaUrl = params.get('convite');
     if (conviteNaUrl) { 
       setSlugConvite(conviteNaUrl); 
       setTelaAtual('panfleto'); 
+    }
+
+    const empresaNaUrl = params.get('empresa');
+    if (empresaNaUrl) {
+      setEmpresaVinculada(empresaNaUrl);
     }
   }, []);
 
@@ -87,6 +111,7 @@ export default function App() {
     );
   }
 
+  if (telaAtual === 'perfil') return <PerfilPages />;
   if (telaAtual === 'login') return <Login irParaPanfleto={() => setTelaAtual('panfleto')} irParaPainel={() => setTelaAtual('painel')} />;
   if (telaAtual === 'cadastro') return <Cadastro irParaLogin={() => setTelaAtual('login')} irParaSucesso={() => setTelaAtual('sucesso')} empresaId={empresaVinculada} />;
   if (telaAtual === 'cadastro-maior') return <CadastroAlunoMaior irParaPainel={() => setTelaAtual('painel')} irParaVoltar={() => setTelaAtual('panfleto')} />;
@@ -107,7 +132,7 @@ export default function App() {
   return (
     <Layout userData={userData} telaAtual={telaAtual} setTelaAtual={setTelaAtual}>
       {telaAtual === 'painel' && userData.tipo === 'responsavel' && <PainelResponsavel telaAtual={telaAtual} />}
-      {telaAtual === 'painel' && userData.tipo === 'aluno_maior' && <PainelAlunoMaior />}
+      {telaAtual === 'painel' && userData.tipo === 'aluno_maior' && <PainelAlunoMaior telaAtual={telaAtual} />}
       {telaAtual === 'painel' && userData.tipo === 'dependente' && <TelaRadar />}
       
       {telaAtual === 'gerenciar-filhos' && userData.tipo === 'responsavel' && <PainelResponsavel telaAtual={telaAtual} />}
