@@ -9,6 +9,7 @@ import { MdPeople, MdLogout } from "react-icons/md";
 import { IoIosArrowBack } from "react-icons/io";
 import { IoTicket } from "react-icons/io5";
 
+
 interface LayoutProps {
   userData: UserProfile;
   telaAtual: Tela;
@@ -65,11 +66,19 @@ export default function Layout({
           </button>
 
           <button
-            onClick={() => setTelaAtual('radar')}
+            onClick={() => setTelaAtual('Passagens')}
             className="navStyle"
-          >
+          > 
             <IoTicket className="icons" />
             <span className="navText">Passagens</span>
+          </button>
+
+          <button
+            onClick={() => setTelaAtual('Empresa')}
+            className="navStyle"
+          > 
+            <IoTicket className="icons" />
+            <span className="navText">Empresa</span>
           </button>
 
           {userData.tipo === 'responsavel' && (

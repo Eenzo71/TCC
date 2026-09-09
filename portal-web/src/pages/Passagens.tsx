@@ -11,7 +11,7 @@ export default function PainelAlunoMaior() {
       <header style={styles.navbar}>
         <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
           <CiBellOn size={24} style={{ cursor: 'pointer' }} />
-          <div style={{ ...styles.perfil}}><CiUser size={20} /><span><span className="bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent font-bold">Futuro</span></span></div>
+          <div style={styles.perfil}><CiUser size={20} /><span>Aluno</span></div>
         </div>
       </header>
 
