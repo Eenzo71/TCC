@@ -11,8 +11,6 @@ import { validarCep } from '../validations/validarCep.js';
 
 const router = express.Router();
 
-// validação por etapa
-
 router.post('/validar-etapa1', async (req, res) => {
   const { email, password, confirmPassword } = req.body;
 
@@ -33,11 +31,11 @@ router.post('/validar-etapa1', async (req, res) => {
 
 router.post('/validar-etapa2', (req, res) => {
   const { nome, cpf, dataNascimento, celular } = req.body;
-  
+
   if (!nome || nome.length < 3) return res.status(400).json({ valido: false, erro: 'Preencha seu nome completo.' });
   if (!validarCPF(cpf)) return res.status(400).json({ valido: false, erro: 'CPF inválido.' });
   if (!validarMaiorIdade(dataNascimento)) return res.status(400).json({ valido: false, erro: 'Você precisa ter 18 anos ou mais para este perfil.' });
-  
+
   const telLimpo = String(celular || '').replace(/\D/g, '');
   if (telLimpo.length < 10) return res.status(400).json({ valido: false, erro: 'Número de celular inválido.' });
 
@@ -46,16 +44,15 @@ router.post('/validar-etapa2', (req, res) => {
 
 router.post('/validar-etapa3', (req, res) => {
   const { cep, estado, cidade, bairro, rua, numero } = req.body;
-  
+
   if (!cep || !estado || !cidade || !bairro || !rua || !numero) {
     return res.status(400).json({ valido: false, erro: 'Preencha todos os campos obrigatórios do endereço.' });
   }
   if (!validarCep(cep)) return res.status(400).json({ valido: false, erro: 'CEP inválido.' });
-  
+
   return res.status(200).json({ valido: true, mensagem: 'Endereço OK!' });
 });
 
-// escolas por Cidade
 router.get('/escolas-por-cidade', async (req, res) => {
   try {
     const { cidade, estado } = req.query;
@@ -64,7 +61,6 @@ router.get('/escolas-por-cidade', async (req, res) => {
     const empresasSnapshot = await dbAdmin.collection('empresas').get();
     let escolasEncontradas = [];
 
-    // O ideal no futuro é buscar direto por indexação, mas por enquanto varremos as empresas
     empresasSnapshot.forEach(doc => {
       const dadosEmpresa = doc.data();
       if (dadosEmpresa.escolas_atendidas && dadosEmpresa.escolas_atendidas.length > 0) {
@@ -108,29 +104,29 @@ router.post('/cadastrar-maior', async (req, res) => {
       password: senha,
       displayName: dados_pessoais.nome
     });
-    
+
     const dadosPassageiro = {
       nome_passageiro: dados_pessoais.nome,
       cpf_passageiro: criptografar(dados_pessoais.cpf),
       data_nascimento: criptografar(dados_pessoais.dataNascimento),
       telefone: criptografar(dados_pessoais.telefone),
       telefone_emergencia: criptografar(dados_pessoais.telefone_emergencia),
-      
+
       tipo_cadastro: tipo_cadastro,
-      responsavel_id: userRecord.uid, 
+      responsavel_id: userRecord.uid,
       empresa_id: empresa_id || null,
-      
+
       dados_escolares: dados_escolares ? {
         instituicao: dados_escolares.instituicao,
         turma: dados_escolares.turma,
         pendente_revisao: dados_escolares.pendente_revisao,
-        matricula: criptografar(dados_escolares.matricula) 
+        matricula: criptografar(dados_escolares.matricula)
       } : null,
-      
+
       endereco_embarque: {
         cep: criptografar(endereco.cep),
         estado: criptografar(endereco.estado),
-        cidade: criptografar(endereco.cidade), 
+        cidade: criptografar(endereco.cidade),
         bairro: criptografar(endereco.bairro),
         rua: criptografar(endereco.rua),
         numero: criptografar(endereco.numero),
@@ -138,7 +134,7 @@ router.post('/cadastrar-maior', async (req, res) => {
         lat: criptografar(endereco.lat),
         lng: criptografar(endereco.lng)
       },
-      
+
       data_registro: new Date().toISOString()
     };
 
@@ -152,7 +148,6 @@ router.post('/cadastrar-maior', async (req, res) => {
   }
 });
 
-// cadastrar dependente
 router.post('/cadastrar-dependente', async (req, res) => {
   const { responsavel_id, empresa_id, nome, dataNascimento, instituicao, turma, turmaManual, matricula, email_app, senha_app } = req.body;
 
@@ -176,26 +171,26 @@ router.post('/cadastrar-dependente', async (req, res) => {
     const dadosDependente = {
       nome_passageiro: nome,
       data_nascimento: criptografar(dataNascimento),
-      tipo_cadastro: 'dependente', 
+      tipo_cadastro: 'dependente',
       responsavel_id: responsavel_id,
       empresa_id: empresa_id || null,
-      
+
       dados_escolares: {
         instituicao: instituicao,
         turma: turmaFinal,
         pendente_revisao: precisaRevisao,
-        matricula: criptografar(matricula) 
+        matricula: criptografar(matricula)
       },
-      
-      status_conta: "pendente", 
+
+      status_conta: "pendente",
       data_registro: new Date().toISOString()
     };
 
     await dbAdmin.collection('passageiros').doc(userRecord.uid).set(dadosDependente);
 
-    return res.status(201).json({ 
-      valido: true, 
-      mensagem: 'Dependente adicionado com sucesso e acesso ao App Mobile liberado!' 
+    return res.status(201).json({
+      valido: true,
+      mensagem: 'Dependente adicionado com sucesso e acesso ao App Mobile liberado!'
     });
 
   } catch (error) {
@@ -207,7 +202,6 @@ router.post('/cadastrar-dependente', async (req, res) => {
   }
 });
 
-// descobre o usuário
 router.get('/perfil/:uid', async (req, res) => {
   const { uid } = req.params;
 

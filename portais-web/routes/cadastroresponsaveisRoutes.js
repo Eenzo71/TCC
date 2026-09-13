@@ -12,7 +12,7 @@ import { validarCoordenadas } from '../validations/validarCoordenadas.js';
 
 const router = express.Router();
 
-// Etapa 1
+
 router.post('/validar-etapa1', async (req, res) => { 
     const { email, password, confirmPassword } = req.body;
 
@@ -28,7 +28,7 @@ router.post('/validar-etapa1', async (req, res) => {
     }
 });
 
-// Etapa 2
+
 router.post('/validar-etapa2', (req, res) => {
     const { nome, cpf, celular, telefoneEmergencia } = req.body;
     if (!nome || nome.trim().length < 3) return res.status(400).json({ valido: false, erro: 'Preencha seu nome completo.' });
@@ -38,7 +38,7 @@ router.post('/validar-etapa2', (req, res) => {
     return res.status(200).json({ valido: true, mensagem: 'Dados pessoais ok!' });
 });
 
-// Etapa 3
+
 router.post('/validar-etapa3', (req, res) => {
     const { cep, rua, numero, bairro, cidade, estado } = req.body;
     if (!cep || !rua || !numero || !bairro || !cidade || !estado) return res.status(400).json({ valido: false, erro: 'Preencha todos os campos do endereço.' });
@@ -46,7 +46,7 @@ router.post('/validar-etapa3', (req, res) => {
     return res.status(200).json({ valido: true, mensagem: 'Endereço validado!' });
 });
 
-// Etapa 4
+
 router.post('/validar-etapa4', (req, res) => {
     const { lat, lng } = req.body;
     if (!validarCoordenadas(lat, lng)) return res.status(400).json({ valido: false, erro: 'Coordenadas inválidas. Arraste o pino no mapa corretamente.' });
@@ -103,7 +103,7 @@ router.post('/finalizar', async (req, res) => {
     }
 });
 
-// Rota para listar alunos vinculados à empresa (para o mapa)
+
 router.get('/empresa/:empresaId/alunos', async (req, res) => {
     const { empresaId } = req.params;
 
