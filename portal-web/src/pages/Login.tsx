@@ -31,13 +31,13 @@ export default function Login({ irParaPanfleto, irParaPainel }: LoginProps) {
   return (
     <div className="container">
       <div className="top-bar">
-        <h1>BusGap</h1>
+        <img src="/images/bus_gap_sem_fundo.png" alt="BusGap Logo" />
       </div>
       <div className="main-content">
-        <div className="foto">
-          <img src="/images/bus-image.png" alt="Bus Image" />
-        </div>
-        <div className="log">
+        <div className="log">  
+          <div className="logImgContainer">
+            <img src="/images/ricoFeliz.png" alt="Login Image" className="logImg" />
+          </div>        
           <h3 id="login">Login</h3>
           <hr className="linha-titulo" />
           <form id="login-form" onSubmit={handleLogin}>

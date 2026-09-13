@@ -5,11 +5,12 @@ import PerfilEmpresa from './PerfilEmpresa';
 import CompletarPerfil from './CompletarPerfil';
 import LoginEmpresa from './LoginEmpresa';
 import maparadar from './MapaRadar';
+import GestaoFrota from './GestaoFrota';
 
 import { auth } from './firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 
-type Tela = 'login' | 'cadastro' | 'painel' | 'perfil' | 'completar' | 'maparadar';
+type Tela = 'login' | 'cadastro' | 'painel' | 'perfil' | 'completar' | 'maparadar' | 'gestaofrota';
 
 export default function App() {
   const [telaAtual, setTelaAtual] = useState<Tela>('login');
@@ -35,8 +36,6 @@ export default function App() {
     return () => unsubscribe();
   }, [telaAtual]);
 
-  // public telas
-
   if (telaAtual === 'cadastro') {
     return (
       <CadastroEmpresa
@@ -48,14 +47,12 @@ export default function App() {
 
   if (telaAtual === 'login') {
     return (
-      <LoginEmpresa 
-        irParaCadastro={() => setTelaAtual('cadastro')} 
-        irParaPainel={() => setTelaAtual('painel')} 
+      <LoginEmpresa
+        irParaCadastro={() => setTelaAtual('cadastro')}
+        irParaPainel={() => setTelaAtual('painel')}
       />
     );
   }
-
-  // cutcine enquanto firebase processa a autenticação do usuário
   if (verificandoAuth) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f4f4f9' }}>
@@ -63,26 +60,25 @@ export default function App() {
       </div>
     );
   }
- // caso não esteja logado manda pra tela de login
+  
   if (!usuarioLogado) {
-    setTimeout(() => setTelaAtual('login'), 0); // setTimeout evita erro visual no React
+    setTimeout(() => setTelaAtual('login'), 0);
     return null;
   }
 
-  // private telas
   if (telaAtual === 'painel') {
     return (
       <PainelEmpresa
         irParaLogin={() => setTelaAtual('login')}
         irParaPerfil={() => setTelaAtual('perfil')}
+        irParaCompletar={() => setTelaAtual('completar')}
       />
     );
   }
-
   if (telaAtual === 'perfil') {
     return (
-      <PerfilEmpresa 
-        irParaPainel={() => setTelaAtual('painel')} 
+      <PerfilEmpresa
+        irParaPainel={() => setTelaAtual('painel')}
         irParaCompletar={() => setTelaAtual('completar')}
       />
     );

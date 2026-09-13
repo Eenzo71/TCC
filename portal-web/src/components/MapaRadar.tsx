@@ -12,7 +12,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// icon do bus >>> trocar depois
 const iconeOnibus = new L.Icon({
   iconUrl: 'https://cdn-icons-png.flaticon.com/512/3448/3448339.png',
   iconSize: [40, 40],
@@ -20,7 +19,6 @@ const iconeOnibus = new L.Icon({
   popupAnchor: [0, -40],
 });
 
-// pega a câmera do mapa e vai até o busao
 function CameraDoRadar({ coordenadas }: { coordenadas: [number, number] | null }) {
   const map = useMap();
   useEffect(() => {

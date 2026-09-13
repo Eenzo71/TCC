@@ -60,7 +60,6 @@ export default function LoginEmpresa({ irParaCadastro, irParaPainel }: LoginEmpr
     }
   };
 
-  // 2FA - Verificar código
   const handleVerificarCodigo = async (e: React.FormEvent) => {
     e.preventDefault();
     setErro('');

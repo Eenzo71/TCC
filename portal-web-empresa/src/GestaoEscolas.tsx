@@ -14,7 +14,6 @@ export default function GestaoEscolas() {
   const [escolaSelecionada, setEscolaSelecionada] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(true);
 
-  // busca as escolas que a empresa já cadastrou no Firebase
   useEffect(() => {
     const buscarEscolas = async () => {
       const user = auth.currentUser;
@@ -30,7 +29,6 @@ export default function GestaoEscolas() {
     buscarEscolas();
   }, []);
 
-  // adiciona uma nova Instituição
   const handleAdicionarEscola = async () => {
     if (!novaEscola.trim()) return;
     const user = auth.currentUser;
@@ -50,7 +48,6 @@ export default function GestaoEscolas() {
     }
   };
 
-  // adiciona uma nova Turma dentro de uma Instituição
   const handleAdicionarTurma = async (nomeEscola: string) => {
     if (!novaTurma.trim()) return;
     const user = auth.currentUser;
@@ -101,7 +98,6 @@ export default function GestaoEscolas() {
         Cadastre as escolas e turmas que você atende. Elas aparecerão automaticamente no formulário de matrícula dos seus passageiros.
       </p>
 
-      {/* nova esxola */}
       <div style={styles.cardAdicionar}>
         <input 
           style={styles.input} 
@@ -114,7 +110,6 @@ export default function GestaoEscolas() {
         </button>
       </div>
 
-      {/* lista de esxolas e trumas */}
       <div style={styles.gridEscolas}>
         {escolas.map((escola, index) => (
           <div key={index} style={styles.cardEscola}>
@@ -135,7 +130,6 @@ export default function GestaoEscolas() {
               )}
             </div>
 
-            {/* add nova trumas */}
             {escolaSelecionada === escola.nome ? (
               <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
                 <input 

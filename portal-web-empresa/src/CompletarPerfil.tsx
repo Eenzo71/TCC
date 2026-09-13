@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { auth } from './firebaseConfig';
 import AbaIdentificacao from './complet-perfil/AbaIdentificacao';
 import AbaOperacional from './complet-perfil/AbaOperacional';
 import AbaContato from './complet-perfil/AbaContato';
 import AbaResponsavel from './complet-perfil/AbaResponsavel';
 import AbaDocumentos from './complet-perfil/AbaDocumentos';
+import { onAuthStateChanged } from 'firebase/auth';
 
 interface CompletarPerfilProps {
     irParaPerfil: () => void;
@@ -13,8 +14,8 @@ interface CompletarPerfilProps {
 export default function CompletarPerfil({ irParaPerfil }: CompletarPerfilProps) {
     const [abaAtual, setAbaAtual] = useState(1);
     const [carregando, setCarregando] = useState(false);
+    const [carregandoDadosIniciais, setCarregandoDadosIniciais] = useState(true);
 
-    // estados global
     const [formData, setFormData] = useState({
         porteEmpresa: 'Autônomo',
         nomeAutonomo: '', cpfAutonomo: '', dataNascimentoAutonomo: '',
@@ -28,31 +29,44 @@ export default function CompletarPerfil({ irParaPerfil }: CompletarPerfilProps) 
         emailPrincipal: '', emailFinanceiro: '', siteOficial: '', instagram: '', facebook: '', linkedin: '',
         respNome: '', respCargo: '', respCpf: '', respRg: '', respDataNascimento: '', respTelefone: '', respEmail: '',
         perguntaSeguranca: '', respostaSeguranca: '',
-
         documentos: {} as { [key: string]: string }
     });
 
-    // atualiza texto dos inputs (filtro)
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const res = await fetch(`http://localhost:3000/api/dossie/${user.uid}`);
+                    const json = await res.json();
+
+                    if (json.valido && json.formData) {
+                        setFormData(prev => ({ ...prev, ...json.formData }));
+                    }
+                } catch (error) {
+                    console.error("Erro ao puxar dossiê:", error);
+                } finally {
+                    setCarregandoDadosIniciais(false);
+                }
+            } else {
+                setCarregandoDadosIniciais(false);
+            }
+        });
+        return () => unsubscribe();
+    }, []);
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // upload (simulação)
     const handleUploadFake = (e: React.ChangeEvent<HTMLInputElement>, nomeDoc: string) => {
         if (e.target.files && e.target.files[0]) {
-            setFormData(prev => ({
-                ...prev,
-                documentos: { ...prev.documentos, [nomeDoc]: e.target.files![0].name }
-            }));
+            setFormData(prev => ({ ...prev, documentos: { ...prev.documentos, [nomeDoc]: e.target.files![0].name } }));
         }
     };
 
-    const avancarAba = () => {
-        setAbaAtual(prev => prev + 1);
-    };
+    const avancarAba = () => setAbaAtual(prev => prev + 1);
 
-    // mandar pro back
     const salvarDossie = async () => {
         const user = auth.currentUser;
         if (!user) return alert("Erro: Você precisa estar logado.");
@@ -82,52 +96,57 @@ export default function CompletarPerfil({ irParaPerfil }: CompletarPerfilProps) 
 
     return (
         <div style={styles.telaInteira}>
-            <div style={styles.caixaGigante}>
+            {carregandoDadosIniciais ? (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                    <p style={{ color: '#111', fontSize: '18px', fontWeight: 'bold' }}>⏳ Sincronizando dados...</p>
+                </div>
+            ) : (
+                <div style={styles.caixaGigante}>
 
-                <div style={styles.cabecalho}>
-                    <div>
-                        <h2 style={{ margin: 0, color: '#111' }}>Verificação da Operação</h2>
-                        <p style={{ color: '#666', fontSize: '14px', marginTop: '5px' }}>Complete seu dossiê de transporte.</p>
+                    <div style={styles.cabecalho}>
+                        <div>
+                            <h2 style={{ margin: 0, color: '#111' }}>Verificação da Operação</h2>
+                            <p style={{ color: '#666', fontSize: '14px', marginTop: '5px' }}>Complete seu dossiê de transporte.</p>
+                        </div>
+                        <button onClick={irParaPerfil} style={styles.btnCancelar}>Cancelar</button>
                     </div>
-                    <button onClick={irParaPerfil} style={styles.btnCancelar}>Cancelar</button>
-                </div>
 
-                <div style={styles.containerAbas}>
-                    <button onClick={() => setAbaAtual(1)} style={abaAtual === 1 ? styles.abaAtiva : styles.abaInativa}>1. Identificação</button>
-                    <button onClick={() => setAbaAtual(2)} style={abaAtual === 2 ? styles.abaAtiva : styles.abaInativa}>2. Operacional</button>
-                    <button onClick={() => setAbaAtual(3)} style={abaAtual === 3 ? styles.abaAtiva : styles.abaInativa}>3. Contatos</button>
-                    <button onClick={() => setAbaAtual(4)} style={abaAtual === 4 ? styles.abaAtiva : styles.abaInativa}>4. Responsável</button>
-                    <button onClick={() => setAbaAtual(5)} style={abaAtual === 5 ? styles.abaAtiva : styles.abaInativa}>5. Documentos</button>
-                </div>
+                    <div style={styles.containerAbas}>
+                        <button onClick={() => setAbaAtual(1)} style={abaAtual === 1 ? styles.abaAtiva : styles.abaInativa}>1. Identificação</button>
+                        <button onClick={() => setAbaAtual(2)} style={abaAtual === 2 ? styles.abaAtiva : styles.abaInativa}>2. Operacional</button>
+                        <button onClick={() => setAbaAtual(3)} style={abaAtual === 3 ? styles.abaAtiva : styles.abaInativa}>3. Contatos</button>
+                        <button onClick={() => setAbaAtual(4)} style={abaAtual === 4 ? styles.abaAtiva : styles.abaInativa}>4. Responsável</button>
+                        <button onClick={() => setAbaAtual(5)} style={abaAtual === 5 ? styles.abaAtiva : styles.abaInativa}>5. Documentos</button>
+                    </div>
 
-                <div style={styles.areaFormulario}>
-                    {/* componentes */}
-                    {abaAtual === 1 && <AbaIdentificacao formData={formData} handleChange={handleChange} />}
-                    {abaAtual === 2 && <AbaOperacional formData={formData} handleChange={handleChange} />}
-                    {abaAtual === 3 && <AbaContato formData={formData} handleChange={handleChange} />}
-                    {abaAtual === 4 && <AbaResponsavel formData={formData} handleChange={handleChange} />}
-                    {abaAtual === 5 && <AbaDocumentos formData={formData} handleUploadFake={handleUploadFake} />}
-                </div>
+                    <div style={styles.areaFormulario}>
+                        {abaAtual === 1 && <AbaIdentificacao formData={formData} handleChange={handleChange} />}
+                        {abaAtual === 2 && <AbaOperacional formData={formData} handleChange={handleChange} />}
+                        {abaAtual === 3 && <AbaContato formData={formData} handleChange={handleChange} />}
+                        {abaAtual === 4 && <AbaResponsavel formData={formData} handleChange={handleChange} />}
+                        {abaAtual === 5 && <AbaDocumentos formData={formData} handleUploadFake={handleUploadFake} />}
+                    </div>
 
-                <div style={styles.rodape}>
-                    {abaAtual > 1 && <button onClick={() => setAbaAtual(prev => prev - 1)} style={styles.btnVoltar}>Anterior</button>}
-                    {abaAtual < 5 ? (
-                        <button onClick={avancarAba} style={styles.btnAvancar}>Próximo Passo</button>
-                    ) : (
-                        <button onClick={salvarDossie} disabled={carregando} style={styles.btnSalvarTudo}>
-                            {carregando ? '⏳ Carregando Dossiê...' : '✅ Enviar Dossiê'}
-                        </button>
-                    )}
-                </div>
+                    <div style={styles.rodape}>
+                        {abaAtual > 1 && <button onClick={() => setAbaAtual(prev => prev - 1)} style={styles.btnVoltar}>Anterior</button>}
+                        {abaAtual < 5 ? (
+                            <button onClick={avancarAba} style={styles.btnAvancar}>Próximo Passo</button>
+                        ) : (
+                            <button onClick={salvarDossie} disabled={carregando} style={styles.btnSalvarTudo}>
+                                {carregando ? '⏳ Carregando Dossiê...' : '✅ Enviar Dossiê'}
+                            </button>
+                        )}
+                    </div>
 
-            </div>
+                </div>
+            )}
         </div>
     );
 }
 
 const styles: { [key: string]: React.CSSProperties } = {
-    telaInteira: { display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: '#f4f4f9', fontFamily: 'sans-serif', padding: '20px' },
-    caixaGigante: { width: '900px', backgroundColor: '#fff', borderRadius: '15px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', overflow: 'hidden' },
+    telaInteira: { width: '100%', height: '100%', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' },
+    caixaGigante: { width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: '15px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', overflow: 'hidden' },
     cabecalho: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '30px', borderBottom: '1px solid #eee' },
     btnCancelar: { padding: '8px 15px', backgroundColor: '#fff', color: '#d32f2f', border: '1px solid #d32f2f', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' },
     containerAbas: { display: 'flex', backgroundColor: '#fafafa', borderBottom: '1px solid #ddd', overflowX: 'auto' },

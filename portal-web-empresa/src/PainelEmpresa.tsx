@@ -3,23 +3,27 @@ import { auth, db } from './firebaseConfig';
 import { doc, getDoc, collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 
+import PerfilEmpresa from './PerfilEmpresa';
 import GestaoEscolas from './GestaoEscolas';
 import MapaRadar from './MapaRadar';
 import MapaRoteirizacao from './MapaRoteirizacao';
+import GestaoFrota from './GestaoFrota';
+import CompletarPerfil from './CompletarPerfil';
+import PersonalizacaoLink from './PersonalizacaoLink';
 
 const Icon = ({ name }: { name: string }) => <span style={{ marginRight: '10px' }}>{name}</span>;
 
 interface PainelEmpresaProps {
   irParaLogin: () => void;
   irParaPerfil: () => void;
+  irParaCompletar: () => void;
 }
 
-export default function PainelEmpresa({ irParaLogin, irParaPerfil }: PainelEmpresaProps) {
+export default function PainelEmpresa({ irParaLogin, irParaPerfil, irParaCompletar }: PainelEmpresaProps) {
   const [empresa, setEmpresa] = useState<any>(null);
   const [carregando, setCarregando] = useState(true);
-  const [abaAtiva, setAbaAtiva] = useState<'monitoramento' | 'roteirizacao' | 'escolas' | 'ajustes'>('monitoramento');
+  const [abaAtiva, setAbaAtiva] = useState<'monitoramento' | 'roteirizacao' | 'escolas' | 'frota' | 'perfil' | 'completar' | 'ajustes'>('monitoramento');
 
-  // Estados de Logística
   const [viagensHoje, setViagensHoje] = useState<any[]>([]);
   const [viagemSelecionada, setViagemSelecionada] = useState<any>(null);
   const [pontosTimeline, setPontosTimeline] = useState<any[]>([]);
@@ -41,20 +45,22 @@ export default function PainelEmpresa({ irParaLogin, irParaPerfil }: PainelEmpre
     return () => unsubscribe();
   }, []);
 
-  // Busca as viagens inciadas no dia
   const buscarViagensDoDia = async (empresaId: string) => {
-    const q = query(
-      collection(db, "viagens"),
-      where("empresa_id", "==", empresaId),
-      orderBy("horario_inicio", "desc"),
-      limit(10)
-    );
-    const snap = await getDocs(q);
-    const lista = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    setViagensHoje(lista);
+    try {
+      const q = query(
+        collection(db, "viagens"),
+        where("empresa_id", "==", empresaId),
+        orderBy("horario_inicio", "desc"),
+        limit(10)
+      );
+      const snap = await getDocs(q);
+      const lista = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      setViagensHoje(lista);
+    } catch (error) {
+      console.warn("⚠️ Sem permissão para ler viagens diretamente pelo Front. Mais tarde passaremos isso para a API!");
+    }
   };
 
-  // Quando clica em uma viagem, busca os pontos no mapa
   const carregarLinhaDoTempo = async (viagem: any) => {
     setViagemSelecionada(viagem);
     const q = query(
@@ -70,11 +76,13 @@ export default function PainelEmpresa({ irParaLogin, irParaPerfil }: PainelEmpre
   return (
     <div style={styles.containerDashboard}>
 
-      {/* SIDEBAR */}
       <aside style={styles.sidebar}>
         <div style={styles.logo}>BUSGAP <span style={{ fontSize: '10px', color: '#4caf50' }}>CORP</span></div>
 
         <nav style={styles.nav}>
+          <button style={abaAtiva === 'perfil' ? styles.navBtnAtivo : styles.navBtn} onClick={() => setAbaAtiva('perfil')}>
+            <Icon name="🏢" /> Perfil e Dossiê
+          </button>
           <button style={abaAtiva === 'monitoramento' ? styles.navBtnAtivo : styles.navBtn} onClick={() => setAbaAtiva('monitoramento')}>
             <Icon name="📡" /> Radar e Logística
           </button>
@@ -83,6 +91,9 @@ export default function PainelEmpresa({ irParaLogin, irParaPerfil }: PainelEmpre
           </button>
           <button style={abaAtiva === 'escolas' ? styles.navBtnAtivo : styles.navBtn} onClick={() => setAbaAtiva('escolas')}>
             <Icon name="🏫" /> Escolas e Turmas
+          </button>
+          <button style={abaAtiva === 'frota' ? styles.navBtnAtivo : styles.navBtn} onClick={() => setAbaAtiva('frota')}>
+            <Icon name="🚐" /> Gestão de Frota
           </button>
           <button style={abaAtiva === 'ajustes' ? styles.navBtnAtivo : styles.navBtn} onClick={() => setAbaAtiva('ajustes')}>
             <Icon name="🔗" /> Link de Convite
@@ -94,10 +105,8 @@ export default function PainelEmpresa({ irParaLogin, irParaPerfil }: PainelEmpre
         </div>
       </aside>
 
-      {/* PRINCIPAL */}
       <main style={styles.mainContent}>
 
-        {/* CABEÇAI */}
         <header style={styles.header}>
           <div>
             <h1 style={{ margin: 0, fontSize: '20px' }}>Dashboard Administrativo</h1>
@@ -106,13 +115,22 @@ export default function PainelEmpresa({ irParaLogin, irParaPerfil }: PainelEmpre
           <div style={styles.statusBadge}>Operação Normal</div>
         </header>
 
-        {/* ÁREA DAS ABAS */}
         <div style={styles.contentArea}>
+          {abaAtiva === 'perfil' && (
+            <PerfilEmpresa
+              irParaPainel={() => setAbaAtiva('monitoramento')}
+              irParaCompletar={() => setAbaAtiva('completar')}
+            />
+          )}
 
+          {abaAtiva === 'completar' && (
+            <CompletarPerfil
+              irParaPerfil={() => setAbaAtiva('perfil')}
+            />
+          )}
           {abaAtiva === 'monitoramento' && (
             <div style={styles.gridMonitoramento}>
 
-              {/* MAPA */}
               <div style={styles.colunaMapa}>
                 <div style={styles.cardMapa}>
                   <MapaRadar pontosTimeline={pontosTimeline} />
@@ -124,7 +142,6 @@ export default function PainelEmpresa({ irParaLogin, irParaPerfil }: PainelEmpre
                 </div>
               </div>
 
-              {/* TIMELINE */}
               <div style={styles.colunaTimeline}>
                 <h3 style={{ marginTop: 0, fontSize: '16px' }}>Histórico de Viagens (Hoje)</h3>
                 <div style={styles.listaViagens}>
@@ -170,13 +187,13 @@ export default function PainelEmpresa({ irParaLogin, irParaPerfil }: PainelEmpre
 
           {abaAtiva === 'escolas' && <GestaoEscolas />}
 
+          {abaAtiva === 'frota' && <GestaoFrota />}
+
           {abaAtiva === 'ajustes' && (
-            <div style={styles.cardInviteFull}>
-              <h3>Link do Panfleto Digital</h3>
-              <p>Compartilhe para vincular passageiros automaticamente.</p>
-              <div style={styles.caixaLink}>http://localhost:5174/?convite={empresa?.slug_convite}</div>
-              <button style={styles.btnCopiar}>Copiar Link</button>
-            </div>
+            <PersonalizacaoLink
+              empresa={empresa}
+              onAtualizarEmpresa={(novaUrl) => setEmpresa({ ...empresa, imagem_login: novaUrl })}
+            />
           )}
 
         </div>

@@ -10,11 +10,7 @@ import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl,
-  iconUrl,
-  shadowUrl,
-});
+L.Icon.Default.mergeOptions({ iconRetinaUrl, iconUrl, shadowUrl });
 
 interface CadastroEmpresaProps {
   irParaLogin: () => void;
@@ -29,6 +25,7 @@ export default function CadastroEmpresa({ irParaLogin, irParaPainel }: CadastroE
   const [formData, setFormData] = useState({
     email: '', password: '', confirmPassword: '',
     razaoSocial: '', nomeFantasia: '', cnpj: '', 
+    naoTemRazaoSocial: false, naoTemCnpj: false, 
     nomeResponsavel: '', cpfResponsavel: '', telefoneEmpresa: '',
     cep: '', estado: '', cidade: '', bairro: '', rua: '', numero: '', complemento: '',
     lat: '', lng: '',
@@ -40,7 +37,7 @@ export default function CadastroEmpresa({ irParaLogin, irParaPainel }: CadastroE
     const valorFinal = type === 'checkbox' ? checked : value;
     
     setFormData(prev => ({ ...prev, [name]: valorFinal }));
-    // cep
+    
     if (name === 'cep') {
       const cepLimpo = value.replace(/\D/g, '');
       if (cepLimpo.length === 8) {
@@ -49,194 +46,143 @@ export default function CadastroEmpresa({ irParaLogin, irParaPainel }: CadastroE
           const data = await response.json();
           if (!data.erro) {
             setFormData(prev => ({
-              ...prev,
-              rua: data.logradouro,
-              bairro: data.bairro,
-              cidade: data.localidade,
-              estado: data.uf
+              ...prev, rua: data.logradouro, bairro: data.bairro, cidade: data.localidade, estado: data.uf
             }));
           }
-        } catch (error) {
-          console.error("Erro ao buscar CEP:", error);
-        }
+        } catch (error) { console.error("Erro CEP:", error); }
       }
     }
   };
 
   const nextStep = async () => {
-    // login
     if (step === 1) {
       try {
-        const respostaBack = await fetch('http://localhost:3000/api/empresa/validar-etapa1', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password,
-            confirmPassword: formData.confirmPassword
-          })
+        const res = await fetch('http://localhost:3000/api/empresa/validar-etapa1', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: formData.email, password: formData.password, confirmPassword: formData.confirmPassword })
         });
-
-        const dadosBack = await respostaBack.json();
-
-        if (!respostaBack.ok || !dadosBack.valido) {
-          if (dadosBack.emailEmUso) {
-            setShowPopupEmail(true);
-            return;
-          }
-          alert(`⚠️ ${dadosBack.erro}`);
-          return;
+        const dados = await res.json();
+        if (!res.ok || !dados.valido) {
+          if (dados.emailEmUso) return setShowPopupEmail(true);
+          return alert(`⚠️ ${dados.erro}`);
         }
-      } catch (error) {
-        alert("Erro de conexão com o servidor de segurança. Verifique se o Back-end está rodando.");
-        return;
-      }
+      } catch (error) { return alert("Erro de conexão."); }
     }
 
-    // dados da empresa
     if (step === 2) {
       try {
-        const respostaBack = await fetch('http://localhost:3000/api/empresa/validar-etapa2', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const res = await fetch('http://localhost:3000/api/empresa/validar-etapa2', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            razaoSocial: formData.razaoSocial,
+            razaoSocial: formData.naoTemRazaoSocial ? 'Autônomo' : formData.razaoSocial,
             nomeFantasia: formData.nomeFantasia,
-            cnpj: formData.cnpj
+            cnpj: formData.naoTemCnpj ? 'Isento' : formData.cnpj,
+            naoTemRazaoSocial: formData.naoTemRazaoSocial,
+            naoTemCnpj: formData.naoTemCnpj
           })
         });
-        const dadosBack = await respostaBack.json();
-        if (!respostaBack.ok || !dadosBack.valido) {
-          alert(`⚠️ ${dadosBack.erro}`);
-          return;
-        }
-      } catch (error) {
-        alert("Erro de conexão com o servidor de segurança.");
-        return;
-      }
+        const dados = await res.json();
+        if (!res.ok || !dados.valido) return alert(`⚠️ ${dados.erro}`);
+      } catch (error) { return alert("Erro de conexão."); }
     }
 
-    // responsavel legal e contato
     if (step === 3) {
-      try {
-        const respostaBack = await fetch('http://localhost:3000/api/empresa/validar-etapa3', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            nomeResponsavel: formData.nomeResponsavel,
-            cpfResponsavel: formData.cpfResponsavel,
-            telefoneEmpresa: formData.telefoneEmpresa
-          })
-        });
-        const dadosBack = await respostaBack.json();
-        if (!respostaBack.ok || !dadosBack.valido) {
-          alert(`⚠️ ${dadosBack.erro}`);
-          return;
-        }
-      } catch (error) {
-        alert("Erro de conexão com o servidor.");
-        return;
-      }
-    }
-
-    // Endereço 
-    if (step === 4) {
-      try {
-        const respostaBack = await fetch('http://localhost:3000/api/empresa/validar-etapa4', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            cep: formData.cep,
-            estado: formData.estado,
-            cidade: formData.cidade,
-            bairro: formData.bairro,
-            rua: formData.rua,
-            numero: formData.numero
-          })
-        });
-        const dadosBack = await respostaBack.json();
-        if (!respostaBack.ok || !dadosBack.valido) {
-          alert(`⚠️ ${dadosBack.erro}`);
-          return;
-        }
-      } catch (error) {
-        alert("Erro de conexão com o servidor.");
-        return;
-      }
-
-      const tentativasBusca = [
-        `${formData.rua}, ${formData.numero}, ${formData.cidade}, ${formData.estado}, Brasil`,
-        `${formData.cidade}, ${formData.estado}, Brasil`,
-        `Brasil`
-      ];
-
-      let coordenadasEncontradas = false;
-      for (const busca of tentativasBusca) {
         try {
-          const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(busca)}`);
-          const data = await response.json();
-          if (data && data.length > 0) {
-            setFormData(prev => ({ ...prev, lat: data[0].lat, lng: data[0].lon }));
-            coordenadasEncontradas = true;
-            break;
+          const respostaBack = await fetch('http://localhost:3000/api/empresa/validar-etapa3', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              nomeResponsavel: formData.nomeResponsavel,
+              cpfResponsavel: formData.cpfResponsavel,
+              telefoneEmpresa: formData.telefoneEmpresa
+            })
+          });
+          const dadosBack = await respostaBack.json();
+          if (!respostaBack.ok || !dadosBack.valido) {
+            alert(`⚠️ ${dadosBack.erro}`);
+            return;
           }
-        } catch (error) { console.error("Erro GPS:", error); }
+        } catch (error) {
+          alert("Erro de conexão com o servidor.");
+          return;
+        }
+      }
+  
+      if (step === 4) {
+        try {
+          const respostaBack = await fetch('http://localhost:3000/api/empresa/validar-etapa4', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              cep: formData.cep,
+              estado: formData.estado,
+              cidade: formData.cidade,
+              bairro: formData.bairro,
+              rua: formData.rua,
+              numero: formData.numero
+            })
+          });
+          const dadosBack = await respostaBack.json();
+          if (!respostaBack.ok || !dadosBack.valido) {
+            alert(`⚠️ ${dadosBack.erro}`);
+            return;
+          }
+        } catch (error) {
+          alert("Erro de conexão com o servidor.");
+          return;
+        }
+  
+        const tentativasBusca = [
+          `${formData.rua}, ${formData.numero}, ${formData.cidade}, ${formData.estado}, Brasil`,
+          `${formData.cidade}, ${formData.estado}, Brasil`,
+          `Brasil`
+        ];
+  
+        let coordenadasEncontradas = false;
+        for (const busca of tentativasBusca) {
+          try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(busca)}`);
+            const data = await response.json();
+            if (data && data.length > 0) {
+              setFormData(prev => ({ ...prev, lat: data[0].lat, lng: data[0].lon }));
+              coordenadasEncontradas = true;
+              break;
+            }
+          } catch (error) { console.error("Erro GPS:", error); }
+        }
+  
+        if (!coordenadasEncontradas) {
+          alert("Erro ao buscar coordenadas. Tente novamente.");
+          return;
+        }
       }
 
-      if (!coordenadasEncontradas) {
-        alert("Erro ao buscar coordenadas. Tente novamente.");
-        return;
-      }
-    }
-    
     setStep(step + 1);
   };
   
   const prevStep = () => setStep(step - 1);
 
-  // path final
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.termosAceitos) {
-      alert("Você precisa aceitar os Termos de Uso para criar a conta da empresa.");
-      return;
-    }
-
+    if (!formData.termosAceitos) return alert("Aceite os Termos de Uso.");
     setCarregandoFinal(true);
 
     try {
-      const respostaCriacao = await fetch('http://localhost:3000/api/empresa/finalizar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          formData: formData 
-        })
+      const res = await fetch('http://localhost:3000/api/empresa/finalizar', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email, password: formData.password, formData: formData })
       });
-
-      const dadosCriacao = await respostaCriacao.json();
-
-      if (!respostaCriacao.ok || !dadosCriacao.valido) {
-        alert(`⚠️ Erro de Segurança: ${dadosCriacao.erro}`);
+      const dados = await res.json();
+      if (!res.ok || !dados.valido) {
+        alert(`⚠️ Erro: ${dados.erro}`);
         setCarregandoFinal(false);
         return;
       }
-
-      // auto-login
       try {
         await signInWithEmailAndPassword(auth, formData.email, formData.password);
         irParaPainel();
-      } catch (loginError) {
-        alert("Conta corporativa criada com sucesso! Por favor, faça o login manualmente.");
-        irParaLogin();
-      }
-
-    } catch (error: any) {
-      alert("Erro crítico de conexão com o servidor.");
-      setCarregandoFinal(false);
-    }
+      } catch (e) { irParaLogin(); }
+    } catch (e) { alert("Erro de conexão."); setCarregandoFinal(false); }
   };
 
   return (
@@ -249,7 +195,6 @@ export default function CadastroEmpresa({ irParaLogin, irParaPainel }: CadastroE
             <div style={{ ...styles.progress, width: step === 1 ? '20%' : step === 2 ? '40%' : step === 3 ? '60%' : step === 4 ? '80%' : '100%' }}></div>
           </div>
 
-          {/* login */}
           {step === 1 && (
             <>
               <h4 style={styles.subTitulo}>1. Credenciais de Acesso</h4>
@@ -263,13 +208,53 @@ export default function CadastroEmpresa({ irParaLogin, irParaPainel }: CadastroE
             </>
           )}
 
-          {/* empresa */}
           {step === 2 && (
             <>
               <h4 style={styles.subTitulo}>2. Dados Jurídicos</h4>
-              <input name="razaoSocial" placeholder="Razão Social (Ex: LingLing Transportes LTDA)" value={formData.razaoSocial} onChange={handleChange} required style={styles.input} />
-              <input name="nomeFantasia" placeholder="Nome Fantasia (Como os pais vão ver)" value={formData.nomeFantasia} onChange={handleChange} required style={styles.input} />
-              <input name="cnpj" placeholder="CNPJ (Somente Números)" value={formData.cnpj} onChange={handleChange} required style={styles.input} />
+              
+              <div style={styles.campoContainer}>
+                <input 
+                  name="razaoSocial" 
+                  placeholder="Razão Social (Ex: LingLing Transportes LTDA)" 
+                  value={formData.naoTemRazaoSocial ? 'Autônomo (Pessoa Física)' : formData.razaoSocial} 
+                  onChange={handleChange} 
+                  disabled={formData.naoTemRazaoSocial}
+                  required={!formData.naoTemRazaoSocial} 
+                  style={{ ...styles.inputBase, backgroundColor: formData.naoTemRazaoSocial ? '#eee' : '#fff', color: formData.naoTemRazaoSocial ? '#888' : '#333' }} 
+                />
+                <div style={styles.checkboxContainer}>
+                  <input type="checkbox" name="naoTemRazaoSocial" id="naoTemRazaoSocial" checked={formData.naoTemRazaoSocial} onChange={handleChange} style={styles.checkbox} />
+                  <label htmlFor="naoTemRazaoSocial" style={styles.labelCheck}>Não tenho Razão Social</label>
+                </div>
+              </div>
+
+              <div style={styles.campoContainer}>
+                <input 
+                  name="nomeFantasia" 
+                  placeholder="Nome Fantasia (Como os pais vão ver)" 
+                  value={formData.nomeFantasia} 
+                  onChange={handleChange} 
+                  required 
+                  style={styles.inputBase} 
+                />
+              </div>
+
+              <div style={styles.campoContainer}>
+                <input 
+                  name="cnpj" 
+                  placeholder="CNPJ (Somente Números)" 
+                  value={formData.naoTemCnpj ? 'Isento' : formData.cnpj} 
+                  onChange={handleChange} 
+                  disabled={formData.naoTemCnpj}
+                  required={!formData.naoTemCnpj} 
+                  style={{ ...styles.inputBase, backgroundColor: formData.naoTemCnpj ? '#eee' : '#fff', color: formData.naoTemCnpj ? '#888' : '#333' }} 
+                />
+                <div style={styles.checkboxContainer}>
+                  <input type="checkbox" name="naoTemCnpj" id="naoTemCnpj" checked={formData.naoTemCnpj} onChange={handleChange} style={styles.checkbox} />
+                  <label htmlFor="naoTemCnpj" style={styles.labelCheck}>Não tenho CNPJ</label>
+                </div>
+              </div>
+
               <div style={styles.botoes}>
                 <button type="button" onClick={prevStep} style={styles.btnVoltar}>Voltar</button>
                 <button type="button" onClick={nextStep} style={styles.btnAvancar}>Próximo</button>
@@ -277,7 +262,6 @@ export default function CadastroEmpresa({ irParaLogin, irParaPainel }: CadastroE
             </>
           )}
 
-          {/* responsavel legal */}
           {step === 3 && (
             <>
               <h4 style={styles.subTitulo}>3. Responsável pela Frota</h4>
@@ -292,7 +276,6 @@ export default function CadastroEmpresa({ irParaLogin, irParaPainel }: CadastroE
             </>
           )}
 
-          {/* endereço */}
           {step === 4 && (
             <>
               <h4 style={styles.subTitulo}>4. Endereço da Garagem/Sede</h4>
@@ -313,7 +296,6 @@ export default function CadastroEmpresa({ irParaLogin, irParaPainel }: CadastroE
             </>
           )}
 
-          {/* coords e termos*/}
           {step === 5 && (
             <>
               <h4 style={styles.subTitulo}>5. Confirmação Final</h4>
@@ -342,36 +324,27 @@ export default function CadastroEmpresa({ irParaLogin, irParaPainel }: CadastroE
               </div>
             </>
           )}
+
         </form>
       </div>
-
-      {showPopupEmail && (
-        <div style={styles.overlay}>
-          <div style={styles.popup}>
-            <h2>E-mail já cadastrado</h2>
-            <p>Este e-mail já pertence a uma empresa ativa no BusGap.</p>
-            <button onClick={() => { sessionStorage.setItem('emailBusGapEmpresa', formData.email); irParaLogin(); }} style={styles.btnAvancar}>Fazer login</button>
-            <button onClick={() => setShowPopupEmail(false)} style={styles.btnVoltar}>Cancelar</button>
-          </div>
-        </div>
-      )}
+      
     </div>
   );
 }
 
 function MarcadorArrastavel({ lat, lng, setFormData }: any) {
-  const [position, setPosition] = useState({ lat: parseFloat(lat), lng: parseFloat(lng) });
-  return (
-    <Marker draggable={true} position={position} eventHandlers={{
-        dragend: (e) => {
-          const pos = e.target.getLatLng();
-          setPosition(pos);
-          setFormData((prev: any) => ({ ...prev, lat: pos.lat.toString(), lng: pos.lng.toString() }));
-        },
-      }}
-    />
-  );
-}
+    const [position, setPosition] = useState({ lat: parseFloat(lat), lng: parseFloat(lng) });
+    return (
+      <Marker draggable={true} position={position} eventHandlers={{
+          dragend: (e) => {
+            const pos = e.target.getLatLng();
+            setPosition(pos);
+            setFormData((prev: any) => ({ ...prev, lat: pos.lat.toString(), lng: pos.lng.toString() }));
+          },
+        }}
+      />
+    );
+  }
 
 const styles: { [key: string]: React.CSSProperties } = {
   telaInteira: { display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: '#f4f4f9' },
@@ -383,6 +356,10 @@ const styles: { [key: string]: React.CSSProperties } = {
   btnAvancar: { width: '48%', height: '45px', borderRadius: '10px', border: 'none', backgroundColor: '#111', color: '#fff', cursor: 'pointer', fontWeight: 'bold' },
   porcentagem: { width: '100%', height: '8px', borderRadius: '10px', marginBottom: '25px', backgroundColor: '#eee', position: 'relative' },
   progress: { height: '100%', backgroundColor: '#4caf50', borderRadius: '10px', transition: 'width 0.3s' },
-  overlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999 },
-  popup: { backgroundColor: '#fff', padding: '30px', borderRadius: '15px', width: '90%', maxWidth: '400px', textAlign: 'center', boxShadow: '0 4px 20px rgba(0,0,0,0.2)' }
+  
+  campoContainer: { marginBottom: '15px', textAlign: 'left' },
+  inputBase: { width: '100%', height: '45px', borderRadius: '10px', border: '1px solid #ccc', padding: '0 15px', boxSizing: 'border-box' },
+  checkboxContainer: { display: 'flex', alignItems: 'center', marginTop: '5px', paddingLeft: '5px' },
+  checkbox: { width: '16px', height: '16px', cursor: 'pointer' },
+  labelCheck: { marginLeft: '8px', fontSize: '12px', color: '#666', cursor: 'pointer', fontWeight: 'bold' }
 };

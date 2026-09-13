@@ -10,9 +10,23 @@ import Layout from './components/Layout';
 import PainelResponsavel from './pages/PainelResponsavel';
 import PainelAlunoMaior from './pages/PainelAlunoMaior';
 import TelaRadar from './pages/TelaRadar';
+import Empresa from './pages/Empresa';
+import Passagens from './pages/Passagens';
+import PerfilPages from './pages/PerfilPages';
 import './style.css';
 
-export type Tela = 'login' | 'cadastro' | 'sucesso' | 'painel' | 'radar' | 'panfleto' | 'cadastro-maior' | 'gerenciar-filhos';
+export type Tela = 
+  | 'login' 
+  | 'cadastro' 
+  | 'sucesso' 
+  | 'painel' 
+  | 'radar' 
+  | 'panfleto' 
+  | 'cadastro-maior' 
+  | 'gerenciar-filhos' 
+  | 'Passagens' 
+  | 'Empresa' 
+  | 'perfil';
 
 export interface UserProfile {
   uid: string;
@@ -47,13 +61,13 @@ export default function App() {
             nome: user.displayName || 'Usuário' 
           });
 
-          setTelaAtual((telaAnterior) => telaAnterior === 'login' ? 'painel' : telaAnterior);
+          setTelaAtual((telaAnterior: Tela) => telaAnterior === 'login' ? 'painel' : telaAnterior);
         } catch (error) {
           console.error('❌ Erro ao consultar o Back-end:', error);
         }
       } else {
         setUserData(null);
-        setTelaAtual((telaAnterior) => (['painel', 'radar'].includes(telaAnterior) ? 'login' : telaAnterior));
+        setTelaAtual((telaAnterior: Tela) => (['painel', 'radar', 'gerenciar-filhos', 'Passagens', 'Empresa', 'perfil'].includes(telaAnterior) ? 'login' : telaAnterior));
       }
       setVerificandoAuth(false);
     });
@@ -62,8 +76,22 @@ export default function App() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    const telaNaUrl = params.get('tela') as Tela | null;
+
+    if (telaNaUrl === 'perfil') {
+      setTelaAtual('perfil');
+    }
+
     const conviteNaUrl = params.get('convite');
-    if (conviteNaUrl) { setSlugConvite(conviteNaUrl); setTelaAtual('panfleto'); }
+    if (conviteNaUrl) { 
+      setSlugConvite(conviteNaUrl); 
+      setTelaAtual('panfleto'); 
+    }
+
+    const empresaNaUrl = params.get('empresa');
+    if (empresaNaUrl) {
+      setEmpresaVinculada(empresaNaUrl);
+    }
   }, []);
 
   useEffect(() => {
@@ -73,32 +101,41 @@ export default function App() {
     }
   }, [telaAtual]);
 
-  // ROTAS PÚBLICAS
-  if (verificandoAuth) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#e8effd' }}><h2 style={{ color: '#1a237e' }}>🛡️ Verificando sessão...</h2></div>;
+  if (verificandoAuth) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#e8effd' }}>
+        <h2 style={{ color: '#1a237e' }}>🛡️ Verificando sessão...</h2>
+      </div>
+    );
+  }
+
+  if (telaAtual === 'perfil') return <PerfilPages />;
   if (telaAtual === 'login') return <Login irParaPanfleto={() => setTelaAtual('panfleto')} irParaPainel={() => setTelaAtual('painel')} />;
   if (telaAtual === 'cadastro') return <Cadastro irParaLogin={() => setTelaAtual('login')} irParaSucesso={() => setTelaAtual('sucesso')} empresaId={empresaVinculada} />;
   if (telaAtual === 'cadastro-maior') return <CadastroAlunoMaior irParaPainel={() => setTelaAtual('painel')} irParaVoltar={() => setTelaAtual('panfleto')} />;
   if (telaAtual === 'panfleto') return <PanfletoDigital slugConvite={slugConvite || ''} irParaCadastroResponsavel={() => setTelaAtual('cadastro')} irParaCadastroAlunoMaior={() => setTelaAtual('cadastro-maior')} />;
-  if (telaAtual === 'sucesso') return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#111' }}><h1 style={{ color: '#fff' }}>🎉 Preparando o BusGap...</h1></div>;
-
-  // ROTAS PRIVADAS
-  if (['painel', 'radar', 'gerenciar-filhos'].includes(telaAtual)) {
-    if (!userData) {
-      setTimeout(() => setTelaAtual('login'), 0);
-      return null;
-    }
-
+  if (telaAtual === 'sucesso') {
     return (
-      <Layout userData={userData} telaAtual={telaAtual} setTelaAtual={setTelaAtual}>
-        {telaAtual === 'painel' && userData.tipo === 'responsavel' && <PainelResponsavel telaAtual={telaAtual} />}
-        {telaAtual === 'painel' && userData.tipo === 'aluno_maior' && <PainelAlunoMaior />}
-        {telaAtual === 'painel' && userData.tipo === 'dependente' && <TelaRadar />}
-        
-        {telaAtual === 'gerenciar-filhos' && userData.tipo === 'responsavel' && <PainelResponsavel telaAtual={telaAtual} />}
-        {telaAtual === 'radar' && <TelaRadar />}
-      </Layout>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#111' }}>
+        <h1 style={{ color: '#fff' }}>🎉 Preparando o BusGap...</h1>
+      </div>
     );
   }
 
-  return null;
+  if (!userData) {
+    return <Login irParaPanfleto={() => setTelaAtual('panfleto')} irParaPainel={() => setTelaAtual('painel')} />;
+  }
+
+  return (
+    <Layout userData={userData} telaAtual={telaAtual} setTelaAtual={setTelaAtual}>
+      {telaAtual === 'painel' && userData.tipo === 'responsavel' && <PainelResponsavel telaAtual={telaAtual} />}
+      {telaAtual === 'painel' && userData.tipo === 'aluno_maior' && <PainelAlunoMaior telaAtual={telaAtual} />}
+      {telaAtual === 'painel' && userData.tipo === 'dependente' && <TelaRadar />}
+      
+      {telaAtual === 'gerenciar-filhos' && userData.tipo === 'responsavel' && <PainelResponsavel telaAtual={telaAtual} />}
+      {telaAtual === 'radar' && <TelaRadar />}
+      {telaAtual === 'Passagens' && <Passagens />}
+      {telaAtual === 'Empresa' && <Empresa />}
+    </Layout>
+  );
 }

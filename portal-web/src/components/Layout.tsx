@@ -1,73 +1,113 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { signOut } from 'firebase/auth';
-import type { UserProfile, Tela } from '../App'; 
+import type { UserProfile, Tela } from '../App';
 import { auth } from '../firebaseConfig';
+import '../layout.css';
+import { GoHomeFill } from "react-icons/go";
+import { TbGps } from "react-icons/tb";
+import { MdPeople, MdLogout } from "react-icons/md";
+import { IoIosArrowBack } from "react-icons/io";
+import { IoTicket } from "react-icons/io5";
+
 
 interface LayoutProps {
   userData: UserProfile;
-  telaAtual: Tela; 
+  telaAtual: Tela;
   setTelaAtual: (tela: Tela) => void;
-  children: React.ReactNode; 
+  children: React.ReactNode;
 }
 
-export default function Layout({ userData, telaAtual, setTelaAtual, children }: LayoutProps) {
-  
+export default function Layout({
+  userData,
+  telaAtual,
+  setTelaAtual,
+  children
+}: LayoutProps) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
   const handleLogout = async () => {
     await signOut(auth);
     setTelaAtual('login');
   };
 
+  const toggleSidebar = () => {
+    setIsCollapsed(prev => !prev);
+  };
+
   return (
-    <div style={{ display: 'flex', height: '100vh', width: '100vw', backgroundColor: '#f4f4f9', overflow: 'hidden' }}>
-      
-      <aside style={{ width: '250px', backgroundColor: '#1a237e', color: 'white', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-          <h2 style={{ margin: '0 0 5px 0' }}>BusGap</h2>
-          <p style={{ margin: 0, fontSize: '14px', color: '#ccc' }}>Olá, {userData.nome}</p>
-          <span style={{ fontSize: '11px', backgroundColor: '#4caf50', padding: '2px 8px', borderRadius: '12px', fontWeight: 'bold' }}>
-            {userData.tipo.toUpperCase().replace('_', ' ')}
-          </span>
+    <div className="layout">
+      <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+        <button className="BtnOpenCloes" onClick={toggleSidebar}>
+          <IoIosArrowBack size={20} className="arrowIcon" />
+        </button>
+    
+        <div className="sidebarHeader">
+          <img className="img-logo" src="/images/Bbus.png" alt="Logo" />
+          <h2 className="logo">BusGap</h2>
         </div>
 
-        <nav style={{ flex: 1, padding: '20px 10px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <nav className="nav">
           {userData.tipo !== 'dependente' && (
-            <button onClick={() => setTelaAtual('painel')} style={navStyle(telaAtual === 'painel')}>
-              🏠 Meu Painel
+            <button
+              onClick={() => setTelaAtual('painel')}
+              className="navStyle"
+            >
+              <GoHomeFill className="icons" />
+              <span className="navText">Meu Painel</span>
             </button>
           )}
-          <button onClick={() => setTelaAtual('radar')} style={navStyle(telaAtual === 'radar')}>
-            📍 Radar GPS
+
+          <button
+            onClick={() => setTelaAtual('radar')}
+            className="navStyle"
+          >
+            <TbGps className="icons" />
+            <span className="navText">Radar GPS</span>
           </button>
+
+          <button
+            onClick={() => setTelaAtual('Passagens')}
+            className="navStyle"
+          > 
+            <IoTicket className="icons" />
+            <span className="navText">Passagens</span>
+          </button>
+
+          <button
+            onClick={() => setTelaAtual('Empresa')}
+            className="navStyle"
+          > 
+            <IoTicket className="icons" />
+            <span className="navText">Empresa</span>
+          </button>
+
           {userData.tipo === 'responsavel' && (
-            <button onClick={() => setTelaAtual('gerenciar-filhos')} style={navStyle(telaAtual === 'gerenciar-filhos')}>
-              👥 Meus Dependentes
+            <button
+              onClick={() => setTelaAtual('gerenciar-filhos')}
+              className="navStyle depender"
+            >
+              <MdPeople className="icons" />
+              <span className="navText">Meus Dependentes</span>
             </button>
           )}
         </nav>
 
-        <div style={{ padding: '20px' }}>
-          <button onClick={handleLogout} style={{ width: '100%', padding: '12px', backgroundColor: '#d32f2f', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
-            Sair do Sistema
+        <div className="logoutContainer">
+          <button
+            onClick={handleLogout}
+            className="btnLogout"
+          >
+            <MdLogout className="icons logoutIcon" />
+            <span className="navText">Sair do Sistema</span>
           </button>
         </div>
       </aside>
 
-      <main style={{ flex: 1, padding: '30px', overflowY: 'auto' }}>
-        {children}
-      </main>
+      <div className="contentWrapper">
+        <main className="mainContent">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
-
-const navStyle = (ativo: boolean): React.CSSProperties => ({
-  textAlign: 'left',
-  padding: '12px 15px',
-  backgroundColor: ativo ? 'rgba(255,255,255,0.15)' : 'transparent',
-  color: ativo ? '#fff' : 'rgba(255,255,255,0.7)',
-  border: 'none',
-  borderRadius: '8px',
-  cursor: 'pointer',
-  fontSize: '15px',
-  fontWeight: ativo ? 'bold' : 'normal',
-  transition: 'all 0.2s'
-});
