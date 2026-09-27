@@ -1,0 +1,36 @@
+[
+    {
+        "nome": "Escola Estadual Professor Plínio Ribeiro",
+        "turmas": [
+            "1º Ano A",
+            "1º Ano B",
+            "2º Ano A",
+            "3º Ano C"
+        ]
+    },
+    {
+        "nome": "Colégio Tiradentes",
+        "turmas": [
+            "6º Ano",
+            "7º Ano",
+            "8º Ano A",
+            "8º Ano B"
+        ]
+    },
+    {
+        "nome": "Instituto Federal de Educação",
+        "turmas": [
+            "Informática 1",
+            "Informática 2",
+            "Edificações 1"
+        ]
+    },
+    {
+        "nome": "Escola Municipal Barão de Macaúbas",
+        "turmas": [
+            "Turma Manhã 1",
+            "Turma Tarde 1",
+            "Turma Tarde 2"
+        ]
+    }
+]

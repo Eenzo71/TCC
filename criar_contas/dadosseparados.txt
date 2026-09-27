@@ -1,0 +1,8 @@
+--- CPF ---
+696.297.872-37
+------------------------------
+
+--- CNAE ---
+codigo: 4929-9/01, descricao: Transporte rodoviário coletivo de passageiros, sob regime de fretamento, municipal
+------------------------------
+

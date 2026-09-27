@@ -1,0 +1,600 @@
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel1@gmail.com
+Senha: 12345678
+Nome: Pietro Amaral Bittencourt
+CPF: 806.119.930-07
+Celular: (55) 90568-6819
+Emergência: (12) 99928-2412
+Endereço: CEP 39440-019, Número 305 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel2@gmail.com
+Senha: 12345678
+Nome: Theo Camila Costa Barreto
+CPF: 671.388.543-82
+Celular: (62) 97089-1273
+Emergência: (57) 92370-3152
+Endereço: CEP 39444-100, Número 458 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel3@gmail.com
+Senha: 12345678
+Nome: João Moreira Diniz
+CPF: 566.440.708-50
+Celular: (93) 97264-6883
+Emergência: (37) 93718-1513
+Endereço: CEP 39445-242, Número 799 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel4@gmail.com
+Senha: 12345678
+Nome: Augusto Carvalho Lafaiete
+CPF: 067.845.748-42
+Celular: (13) 90124-3107
+Emergência: (84) 99441-2954
+Endereço: CEP 39447-514, Número 71 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel5@gmail.com
+Senha: 12345678
+Nome: Josué Maia Inácio
+CPF: 801.681.598-72
+Celular: (26) 95698-7000
+Emergência: (66) 97996-2144
+Endereço: CEP 39442-010, Número 811 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel6@gmail.com
+Senha: 12345678
+Nome: Raul Pires Lamounier
+CPF: 193.484.768-23
+Celular: (83) 93553-2606
+Emergência: (66) 99326-9718
+Endereço: CEP 39444-166, Número 902 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel7@gmail.com
+Senha: 12345678
+Nome: Sérgio Lavínia Dias Firmo
+CPF: 396.769.330-90
+Celular: (24) 93898-8421
+Emergência: (37) 97275-9814
+Endereço: CEP 39447-010, Número 926 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel8@gmail.com
+Senha: 12345678
+Nome: Amâncio Lemos Firmo
+CPF: 882.751.443-02
+Celular: (85) 91482-3345
+Emergência: (35) 92160-5531
+Endereço: CEP 39444-000, Número 703 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel9@gmail.com
+Senha: 12345678
+Nome: Alberto Soares Crepaldi
+CPF: 699.297.967-11
+Celular: (16) 99556-5937
+Emergência: (57) 92162-9359
+Endereço: CEP 39445-009, Número 664 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel10@gmail.com
+Senha: 12345678
+Nome: Marcelo Flora Cavalcante Lebre
+CPF: 016.180.249-49
+Celular: (76) 90231-9991
+Emergência: (45) 94681-7621
+Endereço: CEP 39440-007, Número 64 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel11@gmail.com
+Senha: 12345678
+Nome: Ailton Andrade Guerreiro
+CPF: 085.837.730-68
+Celular: (39) 91922-0011
+Emergência: (13) 96235-8361
+Endereço: CEP 39444-000, Número 703 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel12@gmail.com
+Senha: 12345678
+Nome: Hugo Cavalcante Franco
+CPF: 596.528.059-98
+Celular: (26) 98611-2701
+Emergência: (83) 93552-9483
+Endereço: CEP 39445-009, Número 664 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel13@gmail.com
+Senha: 12345678
+Nome: Benício Pérola Farias Leão
+CPF: 065.109.943-99
+Celular: (56) 92017-1085
+Emergência: (38) 95841-1098
+Endereço: CEP 39448-587, Número 267 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel14@gmail.com
+Senha: 12345678
+Nome: Benjamim Ferreira Drummond
+CPF: 788.392.077-40
+Celular: (61) 98067-8877
+Emergência: (13) 92138-8741
+Endereço: CEP 39444-240, Número 36 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel15@gmail.com
+Senha: 12345678
+Nome: Matheus Cavalcante Falcão
+CPF: 967.733.040-32
+Celular: (21) 91955-0165
+Emergência: (16) 91919-8095
+Endereço: CEP 39445-000, Número 587 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel16@gmail.com
+Senha: 12345678
+Nome: Ravi Pietra Machado Lagares
+CPF: 838.037.956-05
+Celular: (62) 95806-4301
+Emergência: (29) 94875-8026
+Endereço: CEP 39440-025, Número 888 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel17@gmail.com
+Senha: 12345678
+Nome: Theo Leal Loureiro
+CPF: 744.966.886-62
+Celular: (27) 92840-8075
+Emergência: (79) 96636-4258
+Endereço: CEP 39444-166, Número 902 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel18@gmail.com
+Senha: 12345678
+Nome: Iago Cavalcante Arantes
+CPF: 620.239.775-68
+Celular: (52) 98892-9175
+Emergência: (73) 95204-9101
+Endereço: CEP 39448-794, Número 49 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel19@gmail.com
+Senha: 12345678
+Nome: Moisés Marta Ferreira Caetano
+CPF: 467.746.843-51
+Celular: (36) 98831-6729
+Emergência: (59) 91979-0721
+Endereço: CEP 39447-790, Número 385 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel20@gmail.com
+Senha: 12345678
+Nome: Igor Teixeira Gama
+CPF: 773.396.736-87
+Celular: (69) 91067-7925
+Emergência: (58) 97864-9241
+Endereço: CEP 39440-003, Número 157 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel21@gmail.com
+Senha: 12345678
+Nome: Ademir Luísa Prado Iglesias
+CPF: 151.737.665-30
+Celular: (97) 97978-8269
+Emergência: (64) 95481-1166
+Endereço: CEP 39440-003, Número 157 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel22@gmail.com
+Senha: 12345678
+Nome: Samuel Yara Ribeiro Donato
+CPF: 717.039.215-18
+Celular: (61) 91682-4136
+Emergência: (25) 99313-7548
+Endereço: CEP 39440-025, Número 888 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel23@gmail.com
+Senha: 12345678
+Nome: Joaquim Ester Gomes Colaço
+CPF: 559.035.815-95
+Celular: (58) 94150-6234
+Emergência: (36) 94015-0143
+Endereço: CEP 39445-000, Número 587 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel24@gmail.com
+Senha: 12345678
+Nome: Lorenzo Júlia Viana Iglesias
+CPF: 393.551.610-00
+Celular: (21) 96679-4267
+Emergência: (19) 98049-4270
+Endereço: CEP 39444-000, Número 703 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel25@gmail.com
+Senha: 12345678
+Nome: Heitor Bárbara Gomes Júnior
+CPF: 130.028.000-07
+Celular: (15) 92481-6803
+Emergência: (78) 99097-1734
+Endereço: CEP 39447-514, Número 71 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel26@gmail.com
+Senha: 12345678
+Nome: Anselmo Heloísa Leal Cascão
+CPF: 095.918.061-32
+Celular: (98) 90417-3378
+Emergência: (66) 99455-8370
+Endereço: CEP 39444-012, Número 129 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel27@gmail.com
+Senha: 12345678
+Nome: Bryan Torres Firmo
+CPF: 363.652.418-60
+Celular: (63) 94754-0198
+Emergência: (23) 93985-1830
+Endereço: CEP 39448-770, Número 614 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel28@gmail.com
+Senha: 12345678
+Nome: Almir Isabela Andrade Fontes
+CPF: 275.016.922-46
+Celular: (45) 93871-6473
+Emergência: (25) 99052-9801
+Endereço: CEP 39445-000, Número 587 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel29@gmail.com
+Senha: 12345678
+Nome: Aldo Lira Xavier
+CPF: 777.626.342-74
+Celular: (58) 97733-8122
+Emergência: (86) 90997-6475
+Endereço: CEP 39442-004, Número 576 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel30@gmail.com
+Senha: 12345678
+Nome: Wagner Lemos Cascão
+CPF: 403.983.588-34
+Celular: (85) 98292-9527
+Emergência: (18) 92523-5404
+Endereço: CEP 39440-025, Número 888 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel31@gmail.com
+Senha: 12345678
+Nome: Sérgio Agatha Mendes Fontes
+CPF: 674.821.335-50
+Celular: (32) 98493-3528
+Emergência: (83) 93001-7036
+Endereço: CEP 39444-240, Número 36 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel32@gmail.com
+Senha: 12345678
+Nome: Enzo Cruz Barroso
+CPF: 898.604.022-05
+Celular: (21) 96634-3833
+Emergência: (84) 95137-1465
+Endereço: CEP 39440-093, Número 234 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel33@gmail.com
+Senha: 12345678
+Nome: Yuri Luciana Pinto Loureiro
+CPF: 070.314.169-49
+Celular: (64) 98018-1930
+Emergência: (11) 91302-8301
+Endereço: CEP 39440-007, Número 64 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel34@gmail.com
+Senha: 12345678
+Nome: Matheus Pires Catanhede
+CPF: 126.447.782-12
+Celular: (97) 93442-4232
+Emergência: (89) 99095-6588
+Endereço: CEP 39447-790, Número 385 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel35@gmail.com
+Senha: 12345678
+Nome: Eduardo Adriana Farias Gouveia
+CPF: 660.124.313-25
+Celular: (86) 92525-6813
+Emergência: (38) 98896-3756
+Endereço: CEP 39440-001, Número 482 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel36@gmail.com
+Senha: 12345678
+Nome: Carlos Karina Almeida Barroso
+CPF: 083.135.769-01
+Celular: (89) 97283-8920
+Emergência: (13) 92171-0058
+Endereço: CEP 39445-060, Número 218 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel37@gmail.com
+Senha: 12345678
+Nome: Guilherme Alves D'Ávila
+CPF: 952.216.426-70
+Celular: (35) 93554-1906
+Emergência: (74) 97456-3727
+Endereço: CEP 39440-003, Número 157 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel38@gmail.com
+Senha: 12345678
+Nome: Everton Cristiane Batista Gois
+CPF: 785.385.499-44
+Celular: (49) 90338-2118
+Emergência: (36) 96832-8097
+Endereço: CEP 39444-012, Número 129 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel39@gmail.com
+Senha: 12345678
+Nome: Ailton Almeida Brum
+CPF: 134.068.024-60
+Celular: (36) 95391-1561
+Emergência: (76) 92361-4422
+Endereço: CEP 39442-010, Número 811 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel40@gmail.com
+Senha: 12345678
+Nome: Amadeu Sales Camacho
+CPF: 795.744.508-05
+Celular: (45) 97341-2327
+Emergência: (56) 91080-3990
+Endereço: CEP 39448-569, Número 830 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel41@gmail.com
+Senha: 12345678
+Nome: Pedro Vitória Ferreira Henrique
+CPF: 685.558.205-29
+Celular: (51) 94780-3333
+Emergência: (75) 95420-6488
+Endereço: CEP 39440-019, Número 305 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel42@gmail.com
+Senha: 12345678
+Nome: Yuri Ramos Conde
+CPF: 213.484.566-04
+Celular: (41) 93576-9569
+Emergência: (24) 99863-3087
+Endereço: CEP 39445-009, Número 664 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel43@gmail.com
+Senha: 12345678
+Nome: Arthur Márcia Oliveira Bandeira
+CPF: 377.769.348-01
+Celular: (82) 95119-7214
+Emergência: (92) 98703-6667
+Endereço: CEP 39445-487, Número 153 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel44@gmail.com
+Senha: 12345678
+Nome: Miguel Valentina Gonçalves Garcez
+CPF: 628.540.748-74
+Celular: (73) 95424-1134
+Emergência: (49) 96838-9157
+Endereço: CEP 39448-569, Número 830 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel45@gmail.com
+Senha: 12345678
+Nome: Manoel Queiroz Lafaiete
+CPF: 220.242.851-80
+Celular: (26) 96185-3999
+Emergência: (92) 92434-9603
+Endereço: CEP 39448-899, Número 978 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel46@gmail.com
+Senha: 12345678
+Nome: Maria Leite Colaço
+CPF: 678.761.930-80
+Celular: (26) 92388-0960
+Emergência: (68) 95211-1305
+Endereço: CEP 39448-587, Número 267 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel47@gmail.com
+Senha: 12345678
+Nome: Enzo Fernandes D'Ávila
+CPF: 936.282.899-55
+Celular: (24) 97358-2464
+Emergência: (95) 92403-6414
+Endereço: CEP 39448-569, Número 830 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel48@gmail.com
+Senha: 12345678
+Nome: Alvaro Denise Peixoto Assunção
+CPF: 777.054.549-80
+Celular: (11) 92837-5276
+Emergência: (13) 96466-5314
+Endereço: CEP 39444-100, Número 458 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel49@gmail.com
+Senha: 12345678
+Nome: Pedro Eduarda Caldeira Arruda
+CPF: 062.000.782-62
+Celular: (75) 93335-4813
+Emergência: (59) 98463-5007
+Endereço: CEP 39442-018, Número 95 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel50@gmail.com
+Senha: 12345678
+Nome: Alvaro Laila Chaves Hermes
+CPF: 605.452.030-07
+Celular: (31) 92856-5118
+Emergência: (66) 95180-9257
+Endereço: CEP 39445-009, Número 664 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel51@gmail.com
+Senha: 12345678
+Nome: Alexandre Braga Barroso
+CPF: 062.878.650-67
+Celular: (64) 90073-6950
+Emergência: (34) 94155-2006
+Endereço: CEP 39440-041, Número 42 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel52@gmail.com
+Senha: 12345678
+Nome: Fernando Letícia Chaves Colaço
+CPF: 216.704.048-20
+Celular: (42) 90688-7073
+Emergência: (66) 96937-2178
+Endereço: CEP 39440-067, Número 619 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel53@gmail.com
+Senha: 12345678
+Nome: Amarildo Carolina Teixeira Fleury
+CPF: 559.809.789-33
+Celular: (72) 98730-0377
+Emergência: (17) 98700-9745
+Endereço: CEP 39444-240, Número 36 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel54@gmail.com
+Senha: 12345678
+Nome: Bruno Guimarães Castanheira
+CPF: 249.257.466-00
+Celular: (22) 93994-8929
+Emergência: (18) 91897-8829
+Endereço: CEP 39442-004, Número 576 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel55@gmail.com
+Senha: 12345678
+Nome: Moisés Amaral Ferraz
+CPF: 677.209.484-08
+Celular: (69) 94845-7795
+Emergência: (34) 95774-1332
+Endereço: CEP 39445-009, Número 664 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel56@gmail.com
+Senha: 12345678
+Nome: Maria Letícia Gomes Conde
+CPF: 755.984.584-38
+Celular: (46) 98987-6875
+Emergência: (81) 97112-4536
+Endereço: CEP 39445-487, Número 153 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel57@gmail.com
+Senha: 12345678
+Nome: André Ester Pinto Ferraz
+CPF: 942.850.860-85
+Celular: (65) 94702-0998
+Emergência: (23) 99174-4019
+Endereço: CEP 39445-242, Número 799 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel58@gmail.com
+Senha: 12345678
+Nome: Pietro Costa Brum
+CPF: 728.016.894-91
+Celular: (71) 95722-4354
+Emergência: (39) 94036-3570
+Endereço: CEP 39440-067, Número 619 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel59@gmail.com
+Senha: 12345678
+Nome: Alan Ramos Arantes
+CPF: 404.223.030-03
+Celular: (84) 97311-0812
+Emergência: (34) 96969-2515
+Endereço: CEP 39444-240, Número 36 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+
+--- CONTA RESPONSÁVEL ---
+E-mail: responsavel60@gmail.com
+Senha: 12345678
+Nome: Júlio Lemos Graça
+CPF: 564.147.699-40
+Celular: (26) 96562-7583
+Emergência: (75) 93565-5926
+Endereço: CEP 39442-004, Número 576 (Restante preenchido via ViaCEP/Mapa)
+-------------------------
+

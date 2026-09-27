@@ -1,0 +1,6 @@
+[
+  { "natureza": "Sociedade Limitada Unipessoal (SLU)", "sigla": "SLU" },
+  { "natureza": "Sociedade Empresária Limitada (LTDA)", "sigla": "LTDA" },
+  { "natureza": "Empresário Individual (EI)", "sigla": "EI" },
+  { "natureza": "Microempreendedor Individual (MEI)", "sigla": "MEI" }
+]
