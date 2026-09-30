@@ -13,21 +13,21 @@ const AbaDependentes = () => {
   const [dependentes, setDependentes] = useState<any[]>([]);
   const [carregandoFilhos, setCarregandoFilhos] = useState(false);
   const [mostrarModalAdicionar, setMostrarModalAdicionar] = useState(false);
-  const empresaIdDoPai = localStorage.getItem('empresa_vinculada') || ''; 
+  const empresaIdDoPai = localStorage.getItem('empresa_vinculada') || '';
 
   const buscarDependentes = async () => {
     const user = auth.currentUser;
     if (!user) return;
     setCarregandoFilhos(true);
     try {
-      const q = query(collection(db, 'passageiros'), where('responsavel_id', '==', user.uid));
+      const q = query(collection(db, 'usuarios'), where('responsavel_id', '==', user.uid));
       const querySnapshot = await getDocs(q);
       setDependentes(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    } catch (error) { 
-      console.error("Erro ao buscar dependentes:", error); 
-    } 
-    finally { 
-      setCarregandoFilhos(false); 
+    } catch (error) {
+      console.error("Erro ao buscar dependentes:", error);
+    }
+    finally {
+      setCarregandoFilhos(false);
     }
   };
 
@@ -51,7 +51,7 @@ const AbaDependentes = () => {
           {carregandoFilhos ? <p>Buscando passageiros...</p> : dependentes.length === 0 ? <p>Você ainda não cadastrou nenhum passageiro.</p> : dependentes.map((filho) => (
             <div key={filho.id} style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', display: 'flex', justifyContent: 'space-between' }}>
               <div>
-                <h4 style={{ margin: '0 0 8px 0', fontSize: '18px' }}>{filho.nome_passageiro}</h4>
+                <h4 style={{ margin: '0 0 8px 0', fontSize: '18px' }}>{filho.nome}</h4>
                 <p style={{ margin: 0, fontSize: '14px', color: '#666' }}>🏫 {filho.dados_escolares?.instituicao} | 📖 {filho.dados_escolares?.turma}</p>
               </div>
             </div>
@@ -94,15 +94,15 @@ export default function PainelResponsavel({ telaAtual }: { telaAtual: string }) 
         </div>
 
         <div style={styles.secaoLogo}>
-          <img src="/images/bus_gap_sem_fundo.png" alt="Logo BusGap" style={styles.logoNavbar}/>
+          <img src="/images/bus_gap_sem_fundo.png" alt="Logo BusGap" style={styles.logoNavbar} />
         </div>
 
         <div style={styles.secaoPerfil} ref={dropdownRef}>
           <CiBellOn size={24} style={{ cursor: 'pointer', color: '#004181', flexShrink: 0 }} />
-          
+
           <div style={{ position: 'relative' }}>
-            <div 
-              style={styles.perfil} 
+            <div
+              style={styles.perfil}
               onClick={() => setMenuAberto(!menuAberto)}
             >
               <CiUser size={20} />
@@ -113,7 +113,7 @@ export default function PainelResponsavel({ telaAtual }: { telaAtual: string }) 
             {menuAberto && (
               <div style={styles.dropdownMenu}>
                 <p style={styles.dropdownLabel}>Sua Conta</p>
-                
+
                 <div style={styles.miniCardPerfil} onClick={abrirPerfilEmNovaAba} title="Abrir perfil completo em nova aba">
                   <div style={styles.avatarMini}>R</div>
                   <div style={{ flex: 1, overflow: 'hidden' }}>

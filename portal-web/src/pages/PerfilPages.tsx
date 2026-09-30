@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { auth, db } from '../firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { 
-  FaUser, FaEnvelope, FaPhone, FaShieldAlt, FaMapMarkerAlt, 
-  FaTimes, FaBus, FaIdCard, FaCheckCircle 
+import {
+  FaUser, FaEnvelope, FaPhone, FaShieldAlt,
+  FaTimes, FaBus, FaIdCard, FaCheckCircle
 } from 'react-icons/fa';
 
 export default function PerfilPages() {
@@ -17,9 +17,9 @@ export default function PerfilPages() {
       if (user) {
         setUsuario(user);
         try {
-          const docRef = doc(db, 'passageiros', user.uid);
+          const docRef = doc(db, 'usuarios', user.uid);
           const docSnap = await getDoc(docRef);
-          
+
           if (docSnap.exists()) {
             setDetalhesExtras(docSnap.data());
           }
@@ -41,9 +41,9 @@ export default function PerfilPages() {
     );
   }
 
-  const nome = usuario?.displayName || detalhesExtras?.nome_passageiro || 'Usuário BusGap';
+  const nome = usuario?.displayName || detalhesExtras?.nome || 'Usuário BusGap';
   const email = usuario?.email || 'Sem e-mail cadastrado';
-  const tipoConta = detalhesExtras?.tipo || 'Passageiro BusGap';
+  const tipoConta = detalhesExtras?.tipo_perfil || 'Passageiro BusGap';
   const empresa = detalhesExtras?.empresa_id || localStorage.getItem('empresa_vinculada') || 'Não vinculada';
   const instituicao = detalhesExtras?.dados_escolares?.instituicao || 'Não informada';
   const turma = detalhesExtras?.dados_escolares?.turma || 'Geral';
@@ -61,7 +61,7 @@ export default function PerfilPages() {
 
         <h1 style={styles.userName}>{nome}</h1>
         <p style={styles.userEmail}>{email}</p>
-        
+
         <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
           <span style={styles.roleBadge}>
             <FaShieldAlt style={{ marginRight: '6px' }} /> {tipoConta.toUpperCase()}

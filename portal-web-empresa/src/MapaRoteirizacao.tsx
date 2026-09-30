@@ -26,9 +26,9 @@ const iconePontoColeta = new L.Icon({
 
 function AtualizaCameraMapa({ centro }: { centro: [number, number] }) {
   const map = useMap();
-  useEffect(() => { 
+  useEffect(() => {
     if (centro && !isNaN(centro[0]) && !isNaN(centro[1])) {
-      map.setView(centro, map.getZoom()); 
+      map.setView(centro, map.getZoom());
     }
   }, [centro, map]);
   return null;
@@ -50,9 +50,9 @@ interface MapaRoteirizacaoProps {
 
 export default function MapaRoteirizacao({ empresaId, empresa }: MapaRoteirizacaoProps) {
   const [alunos, setAlunos] = useState<any[]>([]);
-  
+
   const [centroMapa, setCentroMapa] = useState<[number, number]>([-15.8055, -43.3089]);
-  
+
   const [rotasSalvas, setRotasSalvas] = useState<any[]>([]);
   const [modoDesenho, setModoDesenho] = useState(false);
   const [novaRota, setNovaRota] = useState<[number, number][]>([]);
@@ -75,8 +75,11 @@ export default function MapaRoteirizacao({ empresaId, empresa }: MapaRoteirizaca
 
   const buscarAlunos = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/cadastro/empresa/${empresaId}/alunos`);
-      if (res.ok) setAlunos(await res.json());
+      const res = await fetch(`http://localhost:3000/api/passageiros/alunos/${empresaId}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.valido) setAlunos(json.alunos);
+      }
     } catch (e) { console.error(e); }
   };
 
@@ -116,19 +119,19 @@ export default function MapaRoteirizacao({ empresaId, empresa }: MapaRoteirizaca
 
   return (
     <div style={{ height: '100%', width: '100%', position: 'relative' }}>
-      
+
       <div style={styles.painelFerramentas}>
         <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#1a237e' }}>Construtor de Túneis</h3>
-        
+
         {!modoDesenho ? (
           <button onClick={() => setModoDesenho(true)} style={styles.btnDesenhar}>
             ✏️ Criar Novo Túnel
           </button>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <input 
-              type="text" placeholder="Nome do Túnel..." 
-              value={nomeRota} onChange={e => setNomeRota(e.target.value)} 
+            <input
+              type="text" placeholder="Nome do Túnel..."
+              value={nomeRota} onChange={e => setNomeRota(e.target.value)}
               style={styles.inputNome}
             />
             <p style={{ margin: 0, fontSize: '12px', color: '#d32f2f' }}>
@@ -157,12 +160,12 @@ export default function MapaRoteirizacao({ empresaId, empresa }: MapaRoteirizaca
         {alunos
           .filter(aluno => aluno.lat && aluno.lng && !isNaN(Number(aluno.lat)) && !isNaN(Number(aluno.lng)))
           .map(aluno => (
-          <Marker key={aluno.id} position={[Number(aluno.lat), Number(aluno.lng)]} icon={iconeCasa}>
-            <Popup>
-              <strong>{aluno.nome}</strong><br />Bairro: {aluno.bairro}
-            </Popup>
-          </Marker>
-        ))}
+            <Marker key={aluno.id} position={[Number(aluno.lat), Number(aluno.lng)]} icon={iconeCasa}>
+              <Popup>
+                <strong>{aluno.nome}</strong><br />Bairro: {aluno.bairro}
+              </Popup>
+            </Marker>
+          ))}
 
         {rotasSalvas.map(rota => (
           rota.pontos && rota.pontos.length > 0 && (

@@ -10,6 +10,7 @@ import MapaRoteirizacao from './MapaRoteirizacao';
 import GestaoFrota from './GestaoFrota';
 import CompletarPerfil from './CompletarPerfil';
 import PersonalizacaoLink from './PersonalizacaoLink';
+import GestaoAlunos from './GestaoAlunos';
 
 const Icon = ({ name }: { name: string }) => <span style={{ marginRight: '10px' }}>{name}</span>;
 
@@ -22,7 +23,7 @@ interface PainelEmpresaProps {
 export default function PainelEmpresa({ irParaLogin, irParaPerfil, irParaCompletar }: PainelEmpresaProps) {
   const [empresa, setEmpresa] = useState<any>(null);
   const [carregando, setCarregando] = useState(true);
-  const [abaAtiva, setAbaAtiva] = useState<'monitoramento' | 'roteirizacao' | 'escolas' | 'frota' | 'perfil' | 'completar' | 'ajustes'>('monitoramento');
+  const [abaAtiva, setAbaAtiva] = useState<'monitoramento' | 'roteirizacao' | 'escolas' | 'frota' | 'alunos' | 'perfil' | 'completar' | 'ajustes'>('monitoramento');
 
   const [viagensHoje, setViagensHoje] = useState<any[]>([]);
   const [viagemSelecionada, setViagemSelecionada] = useState<any>(null);
@@ -94,6 +95,9 @@ export default function PainelEmpresa({ irParaLogin, irParaPerfil, irParaComplet
           </button>
           <button style={abaAtiva === 'frota' ? styles.navBtnAtivo : styles.navBtn} onClick={() => setAbaAtiva('frota')}>
             <Icon name="🚐" /> Gestão de Frota
+          </button>
+          <button style={abaAtiva === 'alunos' ? styles.navBtnAtivo : styles.navBtn} onClick={() => setAbaAtiva('alunos')}>
+            <Icon name="🎓" /> Gestão de Alunos
           </button>
           <button style={abaAtiva === 'ajustes' ? styles.navBtnAtivo : styles.navBtn} onClick={() => setAbaAtiva('ajustes')}>
             <Icon name="🔗" /> Link de Convite
@@ -188,6 +192,8 @@ export default function PainelEmpresa({ irParaLogin, irParaPerfil, irParaComplet
           {abaAtiva === 'escolas' && <GestaoEscolas />}
 
           {abaAtiva === 'frota' && <GestaoFrota />}
+
+          {abaAtiva === 'alunos' && <GestaoAlunos empresaId={empresa?.id} />}
 
           {abaAtiva === 'ajustes' && (
             <PersonalizacaoLink

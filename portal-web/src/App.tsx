@@ -6,7 +6,7 @@ import Cadastro from './pages/cadastro/Cadastro';
 import CadastroAlunoMaior from './pages/cadastro/CadastroAlunoMaior';
 import PanfletoDigital from './pages/cadastro/PanfletoDigital';
 import Login from './pages/Login';
-import Layout from './components/Layout'; 
+import Layout from './components/Layout';
 import PainelResponsavel from './pages/PainelResponsavel';
 import PainelAlunoMaior from './pages/PainelAlunoMaior';
 import TelaRadar from './pages/TelaRadar';
@@ -15,23 +15,23 @@ import Passagens from './pages/Passagens';
 import PerfilPages from './pages/PerfilPages';
 import './style.css';
 
-export type Tela = 
-  | 'login' 
-  | 'cadastro' 
-  | 'sucesso' 
-  | 'painel' 
-  | 'radar' 
-  | 'panfleto' 
-  | 'cadastro-maior' 
-  | 'gerenciar-filhos' 
-  | 'Passagens' 
-  | 'Empresa' 
+export type Tela =
+  | 'login'
+  | 'cadastro'
+  | 'sucesso'
+  | 'painel'
+  | 'radar'
+  | 'panfleto'
+  | 'cadastro-maior'
+  | 'gerenciar-filhos'
+  | 'Passagens'
+  | 'Empresa'
   | 'perfil';
 
 export interface UserProfile {
   uid: string;
   email: string;
-  tipo: 'responsavel' | 'aluno_maior' | 'dependente' | 'empresa';
+  tipo: 'responsavel' | 'maior_idade' | 'menor_idade' | 'empresa';
   nome: string;
 }
 
@@ -47,18 +47,18 @@ export default function App() {
       if (user) {
         try {
           const resposta = await fetch(`http://localhost:3000/api/passageiros/perfil/${user.uid}`);
-          let tipoUsuario = 'dependente'; 
+          let tipoUsuario = 'dependente';
 
           if (resposta.ok) {
             const dados = await resposta.json();
             if (dados.valido) tipoUsuario = dados.tipo;
           }
 
-          setUserData({ 
-            uid: user.uid, 
-            email: user.email!, 
-            tipo: tipoUsuario as any, 
-            nome: user.displayName || 'Usuário' 
+          setUserData({
+            uid: user.uid,
+            email: user.email!,
+            tipo: tipoUsuario as any,
+            nome: user.displayName || 'Usuário'
           });
 
           setTelaAtual((telaAnterior: Tela) => telaAnterior === 'login' ? 'painel' : telaAnterior);
@@ -83,9 +83,9 @@ export default function App() {
     }
 
     const conviteNaUrl = params.get('convite');
-    if (conviteNaUrl) { 
-      setSlugConvite(conviteNaUrl); 
-      setTelaAtual('panfleto'); 
+    if (conviteNaUrl) {
+      setSlugConvite(conviteNaUrl);
+      setTelaAtual('panfleto');
     }
 
     const empresaNaUrl = params.get('empresa');
@@ -129,9 +129,9 @@ export default function App() {
   return (
     <Layout userData={userData} telaAtual={telaAtual} setTelaAtual={setTelaAtual}>
       {telaAtual === 'painel' && userData.tipo === 'responsavel' && <PainelResponsavel telaAtual={telaAtual} />}
-      {telaAtual === 'painel' && userData.tipo === 'aluno_maior' && <PainelAlunoMaior telaAtual={telaAtual} />}
-      {telaAtual === 'painel' && userData.tipo === 'dependente' && <TelaRadar />}
-      
+      {telaAtual === 'painel' && userData.tipo === 'maior_idade' && <PainelAlunoMaior telaAtual={telaAtual} />}
+      {telaAtual === 'painel' && userData.tipo === 'menor_idade' && <TelaRadar />}
+
       {telaAtual === 'gerenciar-filhos' && userData.tipo === 'responsavel' && <PainelResponsavel telaAtual={telaAtual} />}
       {telaAtual === 'radar' && <TelaRadar />}
       {telaAtual === 'Passagens' && <Passagens />}
