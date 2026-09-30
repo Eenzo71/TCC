@@ -80,21 +80,13 @@ router.get('/escolas-por-cidade', async (req, res) => {
 });
 
 router.post('/cadastrar-maior', async (req, res) => {
-  const { email, senha, tipo_cadastro, dados_pessoais, endereco, dados_escolares, empresa_id } = req.body;
+  const { email, senha, dados_pessoais, endereco, dados_escolares, empresa_id } = req.body;
 
   try {
-    if (!validarFormatoEmail(email) || !validarSenha(senha)) {
-      throw new Error("Credenciais inválidas.");
-    }
-    if (!validarCPF(dados_pessoais.cpf)) {
-      throw new Error("CPF inválido detectado no fechamento.");
-    }
-    if (!validarCep(endereco.cep)) {
-      throw new Error("CEP de embarque inválido.");
-    }
-    if (!validarMaiorIdade(dados_pessoais.dataNascimento)) {
-      throw new Error("Acesso negado: O passageiro precisa ter 18 anos completos ou mais.");
-    }
+    if (!validarFormatoEmail(email) || !validarSenha(senha)) throw new Error("Credenciais inválidas.");
+    if (!validarCPF(dados_pessoais.cpf)) throw new Error("CPF inválido detectado no fechamento.");
+    if (!validarCep(endereco.cep)) throw new Error("CEP de embarque inválido.");
+    if (!validarMaiorIdade(dados_pessoais.dataNascimento)) throw new Error("Acesso negado: O passageiro precisa ter 18 anos completos ou mais.");
 
     const CHAVE = process.env.CHAVE_alululu;
     const criptografar = (texto) => texto ? CryptoJS.AES.encrypt(String(texto), CHAVE).toString() : "";
@@ -106,13 +98,13 @@ router.post('/cadastrar-maior', async (req, res) => {
     });
 
     const dadosPassageiro = {
-      nome_passageiro: dados_pessoais.nome,
-      cpf_passageiro: criptografar(dados_pessoais.cpf),
+      nome: dados_pessoais.nome,
+      cpf: criptografar(dados_pessoais.cpf),
       data_nascimento: criptografar(dados_pessoais.dataNascimento),
-      telefone: criptografar(dados_pessoais.telefone),
+      celular: criptografar(dados_pessoais.telefone),
       telefone_emergencia: criptografar(dados_pessoais.telefone_emergencia),
 
-      tipo_cadastro: tipo_cadastro,
+      tipo_perfil: 'maior_idade',
       responsavel_id: userRecord.uid,
       empresa_id: empresa_id || null,
 
@@ -138,7 +130,7 @@ router.post('/cadastrar-maior', async (req, res) => {
       data_registro: new Date().toISOString()
     };
 
-    await dbAdmin.collection('passageiros').doc(userRecord.uid).set(dadosPassageiro);
+    await dbAdmin.collection('usuarios').doc(userRecord.uid).set(dadosPassageiro);
 
     return res.status(201).json({ valido: true, mensagem: 'Passageiro cadastrado com segurança!' });
 
@@ -169,9 +161,10 @@ router.post('/cadastrar-dependente', async (req, res) => {
     });
 
     const dadosDependente = {
-      nome_passageiro: nome,
+      nome: nome,
       data_nascimento: criptografar(dataNascimento),
-      tipo_cadastro: 'dependente',
+      
+      tipo_perfil: 'menor_idade',
       responsavel_id: responsavel_id,
       empresa_id: empresa_id || null,
 
@@ -186,7 +179,7 @@ router.post('/cadastrar-dependente', async (req, res) => {
       data_registro: new Date().toISOString()
     };
 
-    await dbAdmin.collection('passageiros').doc(userRecord.uid).set(dadosDependente);
+    await dbAdmin.collection('usuarios').doc(userRecord.uid).set(dadosDependente);
 
     return res.status(201).json({
       valido: true,
@@ -206,16 +199,10 @@ router.get('/perfil/:uid', async (req, res) => {
   const { uid } = req.params;
 
   try {
-    let doc = await dbAdmin.collection('passageiros').doc(uid).get();
-    if (doc.exists) {
-      return res.status(200).json({ valido: true, tipo: doc.data().tipo_cadastro });
-    }
-
-    doc = await dbAdmin.collection('usuarios').doc(uid).get();
+    let doc = await dbAdmin.collection('usuarios').doc(uid).get();
     if (doc.exists) {
       return res.status(200).json({ valido: true, tipo: doc.data().tipo_perfil });
     }
-
     doc = await dbAdmin.collection('empresas').doc(uid).get();
     if (doc.exists) {
       return res.status(200).json({ valido: true, tipo: doc.data().tipo_perfil || 'empresa' });
@@ -226,6 +213,50 @@ router.get('/perfil/:uid', async (req, res) => {
   } catch (error) {
     console.error("❌ Erro ao buscar perfil mestre:", error);
     return res.status(500).json({ valido: false, erro: 'Erro interno ao buscar perfil.' });
+  }
+});
+
+router.get('/alunos/:empresaId', async (req, res) => {
+  const { empresaId } = req.params;
+
+  try {
+    const snapshot = await dbAdmin.collection('usuarios')
+      .where('empresa_id', '==', empresaId)
+      .where('tipo_perfil', 'in', ['maior_idade', 'menor_idade'])
+      .get();
+
+    const CHAVE = process.env.CHAVE_alululu;
+    const descriptografar = (textoCifrado) => {
+      if (!textoCifrado) return "";
+      try {
+        const bytes = CryptoJS.AES.decrypt(textoCifrado, CHAVE);
+        return bytes.toString(CryptoJS.enc.Utf8) || "";
+      } catch (e) {
+        return "";
+      }
+    };
+    
+    const alunos = [];
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      alunos.push({
+        id: doc.id,
+        nome: data.nome || data.nome_passageiro || 'Passageiro',
+        tipo: data.tipo_perfil === 'menor_idade' ? 'dependente' : 'aluno_maior',
+        escola: data.dados_escolares?.instituicao || 'Não informada',
+        turma: data.dados_escolares?.turma || 'Não informada',
+        status: data.status_conta || 'ativo',
+        
+        lat: descriptografar(data.endereco_embarque?.lat),
+        lng: descriptografar(data.endereco_embarque?.lng),
+        bairro: descriptografar(data.endereco_embarque?.bairro)
+      });
+    });
+
+    return res.status(200).json({ valido: true, alunos });
+  } catch (error) {
+    console.error('❌ Erro ao buscar alunos da empresa:', error);
+    return res.status(500).json({ valido: false, erro: 'Erro interno.' });
   }
 });
 

@@ -12,10 +12,8 @@ import { validarCoordenadas } from '../validations/validarCoordenadas.js';
 
 const router = express.Router();
 
-
 router.post('/validar-etapa1', async (req, res) => { 
     const { email, password, confirmPassword } = req.body;
-
     if (!validarFormatoEmail(email)) return res.status(400).json({ valido: false, erro: 'Formato de e-mail inválido.' });
     if (!validarSenha(password)) return res.status(400).json({ valido: false, erro: 'A senha deve ter pelo menos 6 caracteres.' });
     if (!validarConfirmarSenha(password, confirmPassword)) return res.status(400).json({ valido: false, erro: 'As senhas não coincidem.' });
@@ -28,7 +26,6 @@ router.post('/validar-etapa1', async (req, res) => {
     }
 });
 
-
 router.post('/validar-etapa2', (req, res) => {
     const { nome, cpf, celular, telefoneEmergencia } = req.body;
     if (!nome || nome.trim().length < 3) return res.status(400).json({ valido: false, erro: 'Preencha seu nome completo.' });
@@ -38,14 +35,12 @@ router.post('/validar-etapa2', (req, res) => {
     return res.status(200).json({ valido: true, mensagem: 'Dados pessoais ok!' });
 });
 
-
 router.post('/validar-etapa3', (req, res) => {
     const { cep, rua, numero, bairro, cidade, estado } = req.body;
     if (!cep || !rua || !numero || !bairro || !cidade || !estado) return res.status(400).json({ valido: false, erro: 'Preencha todos os campos do endereço.' });
     if (!validarCep(cep)) return res.status(400).json({ valido: false, erro: 'CEP inválido.' });
     return res.status(200).json({ valido: true, mensagem: 'Endereço validado!' });
 });
-
 
 router.post('/validar-etapa4', (req, res) => {
     const { lat, lng } = req.body;
@@ -63,7 +58,9 @@ router.post('/finalizar', async (req, res) => {
         if (!validarCep(formData.cep)) throw new Error("CEP inválido.");
         if (!validarCoordenadas(formData.lat, formData.lng)) throw new Error("Coordenadas inválidas.");
 
-        const CHAVE = process.env.CHAVE_alululu || "H 83 nvykvmviph, 23 mluôtluv 9832 zvjphs 032 wyvmbukhtlual 77 luyhpghkv 551 lt 9 whkyõlz 64 lzaéapjvz 882 opzavypjhtlual 41 jvuzaybíkvz, 7 ylmslal 300 uãv 12 hwluhz 5 bth 98 xblzaãv 61 kl 4 hwhyêujph, ";
+        // 🛡️ CORREÇÃO DE SEGURANÇA: Chave apenas via variável de ambiente (Sem o fallback || "H 83...")
+        const CHAVE = process.env.CHAVE_alululu;
+        if (!CHAVE) throw new Error("Erro de configuração do servidor: Chave de segurança ausente.");
        
         const criptografar = (texto) => CryptoJS.AES.encrypt(texto || "", CHAVE).toString();
         const criptografarOpcional = (texto) => texto ? CryptoJS.AES.encrypt(texto, CHAVE).toString() : "";
@@ -85,7 +82,7 @@ router.post('/finalizar', async (req, res) => {
                 lng: criptografar(formData.lng)
             },
             tipo_perfil: "responsavel",
-            empresa_vinculada: empresaId || null,
+            empresa_id: empresaId || null, // Padronizado para 'empresa_id' igual aos outros
             data_cadastro: new Date().toISOString()
         };
 
@@ -103,19 +100,17 @@ router.post('/finalizar', async (req, res) => {
     }
 });
 
-
+// 🚀 Rota atualizada para buscar alunos na coleção unificada
 router.get('/empresa/:empresaId/alunos', async (req, res) => {
     const { empresaId } = req.params;
 
     try {
-        let snapshot = await dbAdmin.collection('passageiros').where('empresa_id', '==', empresaId).get();
-
-        if (snapshot.size === 0) {
-            snapshot = await dbAdmin.collection('passageiros').where('empresa_vinculada', '==', empresaId).get();
-        }
+        let snapshot = await dbAdmin.collection('usuarios')
+            .where('empresa_id', '==', empresaId)
+            .where('tipo_perfil', 'in', ['maior_idade', 'menor_idade'])
+            .get();
 
         const CHAVE = process.env.CHAVE_alululu;
-
         const descriptografar = (textoCifrado) => {
             if (!textoCifrado) return "";
             try {
@@ -137,7 +132,7 @@ router.get('/empresa/:empresaId/alunos', async (req, res) => {
             if (latOriginal && lngOriginal) {
                 listaAlunos.push({
                     id: doc.id,
-                    nome: data.nome_passageiro || "Aluno Sem Nome", 
+                    nome: data.nome || "Aluno Sem Nome", 
                     bairro: data.endereco_embarque?.bairro ? descriptografar(data.endereco_embarque.bairro) : "",
                     lat: Number(latOriginal),
                     lng: Number(lngOriginal)
